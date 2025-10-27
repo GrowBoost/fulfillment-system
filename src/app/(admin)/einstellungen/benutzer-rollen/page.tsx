@@ -6,7 +6,7 @@ import {
   TableCell,
   TableHeader,
   TableRow,
-} from "../../../../components/ui/table";
+} from "@/components/ui/table";
 import PageBreadcrumb from "../../../../components/common/PageBreadCrumb";
 import { Modal } from "../../../../components/ui/modal";
 import { useModal } from "../../../../hooks/useModal";
