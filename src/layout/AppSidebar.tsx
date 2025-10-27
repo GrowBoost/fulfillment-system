@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useRef, useState,useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -7,7 +7,6 @@ import { useSidebar } from "../context/SidebarContext";
 import {
   BoxCubeIcon,
   CalenderIcon,
-  ChevronDownIcon,
   GridIcon,
   HorizontaLDots,
   ListIcon,
@@ -17,7 +16,7 @@ import {
   TableIcon,
   UserCircleIcon,
   GroupIcon,
-} from "../icons/index";
+} from "@/icons";
 type NavItem = {
   name: string;
   icon: React.ReactNode;
@@ -46,7 +45,7 @@ const navItems: NavItem[] = [
     name: "Geschäftsführung",
     subItems: [
       { name: "Aufgaben", path: "/geschaeftsfuehrung/aufgaben", pro: false },
-      { name: "Finanzen", path: "/geschaeftsfuehrung/umsatz", pro: false },
+      { name: "Finanzen", path: "/geschaeftsfuehrung/Finanzen", pro: false },
       { name: "KPI's", path: "/geschaeftsfuehrung/kpis", pro: false },
       { name: "Kundenstammdaten", path: "/geschaeftsfuehrung/kundenstammdaten", pro: false },
     ],
@@ -55,10 +54,9 @@ const navItems: NavItem[] = [
     icon: <GroupIcon />,
     name: "Buchhaltung",
     subItems: [
-      { name: "Zahlungen", path: "/backoffice/zahlungen", pro: false },
+      { name: "Rechnungen", path: "/backoffice/rechnungen", pro: false },
       { name: "Mahnwesen", path: "/backoffice/mahnwesen", pro: false },
       { name: "Kündigungen", path: "/backoffice/kuendigungen", pro: false },
-      { name: "E-Mail-Management", path: "/backoffice/email-management", pro: false },
     ],
   },
   {
@@ -69,7 +67,7 @@ const navItems: NavItem[] = [
       { name: "Projekte", path: "/kunden/projekte", pro: false },
       { name: "Offboarding", path: "/kunden/offboarding", pro: false },
       { name: "Empfehlungen & Bewertungen", path: "/kunden/empfehlungen-bewertungen", pro: false },
-      { name: "Kundensupport", path: "/kunden/kundensupport", pro: false },
+      { name: "Kontakt-Historie", path: "/kunden/kontakt-historie", pro: false },
     ],
   },
   {
@@ -84,6 +82,15 @@ const navItems: NavItem[] = [
     icon: <PlugInIcon />, // Using PlugInIcon as a placeholder, can be changed later
     name: "Agenten & Automationen",
     path: "/agenten/agenten",
+  },
+  {
+    icon: <PlugInIcon />, // Placeholder icon for "Einstellungen"
+    name: "Einstellungen",
+    subItems: [
+      { name: "Benutzer & Rollen", path: "/einstellungen/benutzer-rollen", pro: false },
+      { name: "Datenquellen & Schnittstellen", path: "/einstellungen/datenquellen-schnittstellen", pro: false },
+      { name: "Benachrichtigungen", path: "/einstellungen/benachrichtigungen", pro: false },
+    ],
   },
 ];
 
@@ -142,6 +149,24 @@ const othersItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered, showUserProfileLink } = useSidebar();
   const pathname = usePathname();
+  const [isOrganizationDropdownOpen, setIsOrganizationDropdownOpen] = useState(false);
+  const organizationDropdownRef = useRef<HTMLDivElement>(null);
+
+  const toggleOrganizationDropdown = () => {
+    setIsOrganizationDropdownOpen((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (organizationDropdownRef.current && !organizationDropdownRef.current.contains(event.target as Node)) {
+        setIsOrganizationDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -180,16 +205,6 @@ const AppSidebar: React.FC = () => {
                 </span>
                 {(isExpanded || isHovered || isMobileOpen) && (
                   <span className={`menu-item-text`}>{nav.name}</span>
-                )}
-                {(isExpanded || isHovered || isMobileOpen) && (
-                  <ChevronDownIcon
-                    className={`ml-auto w-5 h-5 transition-transform duration-200  ${
-                      openSubmenu?.type === menuType &&
-                      openSubmenu?.index === index
-                        ? "rotate-180 text-brand-500"
-                        : ""
-                    }`}
-                  />
                 )}
               </button>
             ) : (
@@ -368,34 +383,63 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link href="/">
-          {isExpanded || isHovered || isMobileOpen ? (
-            <div className="flex items-center gap-2">
+        <div className="relative w-full" ref={organizationDropdownRef}>
+          <button
+            onClick={toggleOrganizationDropdown}
+            className={`flex items-center gap-2 w-full p-2 rounded-lg border border-gray-200 dark:border-gray-700 ${
+              !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+            }`}
+          >
+            {isExpanded || isHovered || isMobileOpen ? (
+              <>
+                <Image
+                  className="dark:hidden"
+                  src="/images/logo/logo.svg"
+                  alt="Logo"
+                  width={60}
+                  height={12}
+                />
+                <Image
+                  className="hidden dark:block"
+                  src="/images/logo/logo-dark.svg"
+                  alt="Logo"
+                  width={60}
+                  height={12}
+                />
+                <span className="text-xl font-semibold text-gray-900 dark:text-white">GrowBoost</span>
+              </>
+            ) : (
               <Image
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/logo-icon.svg"
                 alt="Logo"
-                width={60}
-                height={12}
+                width={16}
+                height={16}
               />
-              <Image
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={60}
-                height={12}
-              />
-              <span className="text-xl font-semibold text-gray-900 dark:text-white">GrowBoost</span>
-            </div>
-          ) : (
-            <Image
-              src="/images/logo/logo-icon.svg"
-              alt="Logo"
-              width={16}
-              height={16}
-            />
-          )}
-        </Link>
+            )}
+          </button>
+
+          <div
+            ref={organizationDropdownRef}
+            className={`absolute left-0 right-0 mt-2 bg-white border border-gray-200 rounded-md shadow-lg dark:bg-gray-800 dark:border-gray-700 overflow-hidden transition-all duration-300 z-50 ${
+              isOrganizationDropdownOpen && (isExpanded || isHovered || isMobileOpen)
+                ? "max-h-40 opacity-100 visible" // Adjust max-h as needed for content
+                : "max-h-0 opacity-0 invisible"
+            }`}
+          >
+            <ul className="py-1">
+              <li>
+                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
+                  GrowBoost
+                </a>
+              </li>
+              <li>
+                <a href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700">
+                  Organisation 2 (Dummy)
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">

@@ -1,13 +1,13 @@
-export type PaymentStatus = 'gezahlt' | 'überfällig' | 'gemahnt' | 'offen';
+export type InvoiceStatus = 'gezahlt' | 'überfällig' | 'gemahnt' | 'offen';
 
-export interface Payment {
+export interface Invoice {
   id: string;
   customerId: string;
   amount: number;
   currency: string;
   dueDate: string;
   paymentDate?: string; // Optional, if payment is not yet made
-  status: PaymentStatus;
+  status: InvoiceStatus;
   description: string;
   overdueSince?: string; // e.g., "38 Tage"
   callAttempts?: number;
@@ -15,7 +15,7 @@ export interface Payment {
   newDueDate?: string; // e.g., "YYYY-MM-DD"
 }
 
-export const paymentData: Payment[] = [
+export const invoiceData: Invoice[] = [
   {
     id: 'PAY001',
     customerId: 'CUST001',

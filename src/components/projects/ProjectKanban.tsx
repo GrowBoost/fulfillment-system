@@ -1,8 +1,7 @@
 "use client";
 
-import Card from "@/components/common/Card";
-import React, { useState } from "react";
-import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd";
+import React, { useState, useRef } from "react";
+import GenericKanban, { GenericColumn, GenericItem } from "@/components/kanban/GenericKanban";
 import Checkbox from "@/components/form/input/Checkbox";
 
 interface ChecklistItem {
@@ -11,17 +10,10 @@ interface ChecklistItem {
   completed: boolean;
 }
 
-interface ProjectCard {
-  id: string;
+interface ProjectCard extends GenericItem {
   customerName: string;
   description: string;
   checklist: ChecklistItem[];
-}
-
-interface ProjectColumn {
-  id: string;
-  title: string;
-  projectCardIds: string[];
 }
 
 const initialProjectCards: { [key: string]: ProjectCard } = {
@@ -56,31 +48,31 @@ const initialProjectCards: { [key: string]: ProjectCard } = {
   },
 };
 
-const initialProjectColumns: { [key: string]: ProjectColumn } = {
+const initialProjectColumns: { [key: string]: GenericColumn } = {
   "column-1": {
     id: "column-1",
     title: "Gestartet",
-    projectCardIds: ["project-1", "project-3"],
+    itemIds: ["project-1", "project-3"],
   },
   "column-2": {
     id: "column-2",
     title: "In Arbeit",
-    projectCardIds: ["project-2"],
+    itemIds: ["project-2"],
   },
   "column-3": {
     id: "column-3",
     title: "Kunde liefert",
-    projectCardIds: [],
+    itemIds: [],
   },
   "column-4": {
     id: "column-4",
     title: "Review",
-    projectCardIds: [],
+    itemIds: [],
   },
   "column-5": {
     id: "column-5",
     title: "Ausgeliefert",
-    projectCardIds: [],
+    itemIds: [],
   },
 };
 
@@ -99,71 +91,14 @@ export default function ProjectKanban() {
   const [isAddColumnModalOpen, setIsAddColumnModalOpen] = useState(false);
   const [newColumnTitle, setNewColumnTitle] = useState("");
 
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeft, setScrollLeft] = useState(0);
+  // Use useRef for unique ID generation
+  const nextCardIdRef = useRef(Object.keys(initialProjectCards).length + 1);
+  const nextColumnIdRef = useRef(Object.keys(initialProjectColumns).length + 1);
 
-  const onDragEnd = (result: DropResult) => {
-    const { destination, source, draggableId } = result;
-
-    if (!destination) {
-      return;
-    }
-
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    ) {
-      return;
-    }
-
-    const start = projectColumns[source.droppableId];
-    const finish = projectColumns[destination.droppableId];
-
-    // Moving within the same column
-    if (start === finish) {
-      const newProjectCardIds = Array.from(start.projectCardIds);
-      newProjectCardIds.splice(source.index, 1);
-      newProjectCardIds.splice(destination.index, 0, draggableId);
-
-      const newColumn = {
-        ...start,
-        projectCardIds: newProjectCardIds,
-      };
-
-      setProjectColumns({
-        ...projectColumns,
-        [newColumn.id]: newColumn,
-      });
-      return;
-    }
-
-    // Moving from one column to another
-    const startProjectCardIds = Array.from(start.projectCardIds);
-    startProjectCardIds.splice(source.index, 1);
-    const newStart = {
-      ...start,
-      projectCardIds: startProjectCardIds,
-    };
-
-    const finishProjectCardIds = Array.from(finish.projectCardIds);
-    finishProjectCardIds.splice(destination.index, 0, draggableId);
-    const newFinish = {
-      ...finish,
-      projectCardIds: finishProjectCardIds,
-    };
-
-    setProjectColumns({
-      ...projectColumns,
-      [newStart.id]: newStart,
-      [newFinish.id]: newFinish,
-    });
-  };
-
-  const handleAddCard = () => {
+  const handleAddCard = (columnId: string) => {
     if (newCardCustomerName.trim() === "") return;
 
-    const newCardId = `project-${Object.keys(projectCards).length + 1}`;
+    const newCardId = `project-${nextCardIdRef.current++}`; // Use ref for unique ID
     const newChecklist: ChecklistItem[] = newCardChecklistItems
       .split(",")
       .filter((item) => item.trim() !== "")
@@ -182,13 +117,15 @@ export default function ProjectKanban() {
     }));
 
     setProjectColumns((prevColumns) => {
-      const gestartetColumn = prevColumns["column-1"]; // Assuming "Gestartet" is the first column
-      const updatedGestartetCardIds = [...gestartetColumn.projectCardIds, newCardId];
+      const targetColumn = prevColumns[columnId];
+      if (!targetColumn) return prevColumns;
+
+      const updatedItemIds = [...targetColumn.itemIds, newCardId];
       return {
         ...prevColumns,
-        "column-1": {
-          ...gestartetColumn,
-          projectCardIds: updatedGestartetCardIds,
+        [columnId]: {
+          ...targetColumn,
+          itemIds: updatedItemIds,
         },
       };
     });
@@ -202,11 +139,11 @@ export default function ProjectKanban() {
   const handleAddColumn = () => {
     if (newColumnTitle.trim() === "") return;
 
-    const newColumnId = `column-${Object.keys(projectColumns).length + 1}`;
-    const newColumn: ProjectColumn = {
+    const newColumnId = `column-${nextColumnIdRef.current++}`; // Use ref for unique ID
+    const newColumn: GenericColumn = {
       id: newColumnId,
       title: newColumnTitle,
-      projectCardIds: [],
+      itemIds: [],
     };
 
     setProjectColumns((prevColumns) => ({
@@ -262,131 +199,70 @@ export default function ProjectKanban() {
 
   const toggleChecklistItem = (cardId: string, itemId: string) => {
     setProjectCards((prevCards) => {
-      const card = prevCards[cardId];
-      const updatedChecklist = card.checklist.map((item) =>
+      const cardToUpdate = prevCards[cardId];
+      if (!cardToUpdate) return prevCards;
+
+      const updatedChecklist = cardToUpdate.checklist.map((item) =>
         item.id === itemId ? { ...item, completed: !item.completed } : item
       );
+
       return {
         ...prevCards,
         [cardId]: {
-          ...card,
+          ...cardToUpdate,
           checklist: updatedChecklist,
         },
       };
     });
   };
 
-  return (
-    <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
-      <div className="mx-auto w-full max-w-[1200px]">
-        <div className="mb-6 flex items-center justify-end gap-3">
-          <button
-            onClick={() => setIsAddCardModalOpen(true)}
-            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-white hover:bg-primary-dark"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-5 w-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-            Neues Projekt
-          </button>
-          <button
-            onClick={() => setIsAddColumnModalOpen(true)}
-            className="flex items-center gap-2 rounded-md bg-green-500 px-4 py-2 text-white hover:bg-green-600"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="h-5 w-5"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-            Neue Phase
-          </button>
-        </div>
+  const handleDragEnd = (newItems: { [key: string]: ProjectCard }, newColumns: { [key: string]: GenericColumn }) => {
+    setProjectCards(newItems);
+    setProjectColumns(newColumns);
+  };
 
-        <DragDropContext onDragEnd={onDragEnd}>
-          <div
-            className="flex gap-4 overflow-x-auto pb-4 no-scrollbar"
-            onMouseDown={(e) => {
-              setIsDragging(true);
-              setStartX(e.pageX - e.currentTarget.offsetLeft);
-              setScrollLeft(e.currentTarget.scrollLeft);
-            }}
-            onMouseLeave={() => setIsDragging(false)}
-            onMouseUp={() => setIsDragging(false)}
-            onMouseMove={(e) => {
-              if (!isDragging) return;
-              e.preventDefault();
-              const x = e.pageX - e.currentTarget.offsetLeft;
-              const walk = (x - startX) * 2;
-              e.currentTarget.scrollLeft = scrollLeft - walk;
-            }}
-          >
-            {Object.values(projectColumns).map((column) => (
-              <Droppable droppableId={column.id} key={column.id}>
-                {(provided) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    className="w-72 flex-shrink-0 rounded-2xl bg-gray-100 p-4 dark:bg-gray-700 min-h-[150px] flex flex-col"
-                  >
-                    <h4 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white/90">
-                      {column.title}
-                    </h4>
-                    {column.projectCardIds.map((cardId, index) => {
-                      const card = projectCards[cardId];
-                      return (
-                        <Draggable
-                          draggableId={card.id}
-                          index={index}
-                          key={card.id}
-                        >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="mb-3 w-full"
-                            >
-                              <Card className="p-4 cursor-pointer" onClick={() => openEditCardModal(card)}>
-                                <h5 className="mb-1 font-medium text-gray-800 dark:text-white/90">
-                                  {card.customerName}
-                                </h5>
-                                <p className="text-sm text-gray-500 dark:text-gray-400">
-                                  {card.description}
-                                </p>
-                              </Card>
-                            </div>
-                          )}
-                        </Draggable>
-                      );
-                    })}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            ))}
-          </div>
-        </DragDropContext>
-      </div>
+  const renderProjectCard = (card: ProjectCard) => (
+    <>
+      <h5 className="mb-1 font-medium text-gray-800 dark:text-white/90">
+        {card.customerName}
+      </h5>
+      <p className="text-sm text-gray-500 dark:text-gray-400">
+        {card.description}
+      </p>
+      {card.checklist.length > 0 && (
+        <div className="mt-2">
+          <h6 className="text-xs font-medium text-gray-700 dark:text-gray-300">Checkliste:</h6>
+          {card.checklist.map((item) => (
+            <div key={item.id} className="flex items-center text-xs text-gray-600 dark:text-gray-400">
+              <Checkbox
+                checked={item.completed}
+                onChange={() => toggleChecklistItem(card.id, item.id)}
+                className="mr-1"
+                id={`${card.id}-${item.id}`}
+              />
+              <label htmlFor={`${card.id}-${item.id}`} className={`${item.completed ? "line-through" : ""}`}>
+                {item.text}
+              </label>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+
+  return (
+    <>
+      <GenericKanban<ProjectCard>
+        initialItems={projectCards}
+        initialColumns={projectColumns}
+        renderItem={renderProjectCard}
+        onDragEndCallback={handleDragEnd}
+        onEditItem={openEditCardModal}
+        itemType="Projekt"
+        columnType="Phase"
+        onAddItem={() => setIsAddCardModalOpen(true)}
+        onAddColumn={() => setIsAddColumnModalOpen(true)}
+      />
 
       {/* Add Project Card Modal */}
       {isAddCardModalOpen && (
@@ -448,7 +324,7 @@ export default function ProjectKanban() {
                 Abbrechen
               </button>
               <button
-                onClick={handleAddCard}
+                onClick={() => handleAddCard(Object.keys(projectColumns)[0])}
                 className="rounded-md bg-primary px-4 py-2 text-white hover:bg-primary-dark"
               >
                 Projekt hinzufügen
@@ -585,6 +461,6 @@ export default function ProjectKanban() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

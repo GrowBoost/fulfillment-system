@@ -1,26 +1,39 @@
-import PageBreadcrumb from "@/components/common/PageBreadCrumb";
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import { Metrics } from "@/app/(admin)/geschaeftsfuehrung/Finanzen/components/Metrics";
 import React from "react";
+import MonthlyTarget from "@/app/(admin)/geschaeftsfuehrung/Finanzen/components/MonthlyTarget";
+import StatisticsChart from "@/app/(admin)/geschaeftsfuehrung/Finanzen/components/StatisticsChart";
+import RecentOrders from "@/app/(admin)/geschaeftsfuehrung/Finanzen/components/RecentOrders";
+import { PriorityTasksOverview } from "@/app/(admin)/geschaeftsfuehrung/Finanzen/components/PriorityTasksOverview";
+import { WarningsOverview } from "@/app/(admin)/geschaeftsfuehrung/Finanzen/components/WarningsOverview";
 
 export const metadata: Metadata = {
   title: "Finanzen | GrowBoost",
-  description: "Dies ist die Finanzen-Seite für Geschäftsführung",
+  description: "Finanzen Übersicht für GrowBoost",
 };
 
 export default function UmsatzPage() {
   return (
-    <div>
-      <PageBreadcrumb pageTitle="Finanzen" />
-      <div className="min-h-screen rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
-        <div className="mx-auto w-full max-w-[630px] text-center">
-          <h3 className="mb-4 font-semibold text-gray-800 text-theme-xl dark:text-white/90 sm:text-2xl">
-            Finanzen
-          </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400 sm:text-base">
-            Beginnen Sie, Inhalte in Rastern oder Panels zu platzieren, Sie können auch verschiedene
-            Kombinationen von Rastern verwenden. Bitte überprüfen Sie das Dashboard und andere Seiten
-          </p>
-        </div>
+    <div className="grid grid-cols-12 gap-4 md:gap-6">
+      <div className="col-span-12 space-y-6 xl:col-span-7">
+        <Metrics />
+        <WarningsOverview />
+      </div>
+
+      <div className="col-span-12 xl:col-span-5">
+        <MonthlyTarget />
+      </div>
+
+      <div className="col-span-12">
+        <StatisticsChart />
+      </div>
+
+      <div className="col-span-12 xl:col-span-5">
+        <PriorityTasksOverview />
+      </div>
+
+      <div className="col-span-12 xl:col-span-7">
+        <RecentOrders />
       </div>
     </div>
   );

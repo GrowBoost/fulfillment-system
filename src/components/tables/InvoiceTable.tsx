@@ -7,11 +7,13 @@ import {
   TableRow,
 } from "../ui/table";
 import Badge from "../ui/badge/Badge";
-import { cancellationData, Cancellation } from "@/data/cancellationData";
-import { Filter } from "@/app/(admin)/backoffice/kuendigungen/page"; // Import types from page.tsx
+import { invoiceData, Invoice } from "@/data/invoiceData"; // Import invoiceData and Invoice interface
+
+import { InvoiceStatus } from "@/data/invoiceData";
+import { Filter } from "@/app/(admin)/backoffice/rechnungen/page"; // Import types from page.tsx
 import { Select } from "../ui/select/Select";
 
-interface CancellationTableProps {
+interface InvoiceTableProps {
   filters: Filter[];
   generalSearchTerm: string;
   currentPage: number;
@@ -21,7 +23,7 @@ interface CancellationTableProps {
   filterLogic: 'AND' | 'OR';
 }
 
-export default function CancellationTable({
+export default function InvoiceTable({
   filters,
   generalSearchTerm,
   currentPage,
@@ -29,27 +31,29 @@ export default function CancellationTable({
   onPageChange,
   onItemsPerPageChange,
   filterLogic,
-}: CancellationTableProps) {
-  const getStatusColor = (status: Cancellation['status']) => {
+}: InvoiceTableProps) {
+  const getStatusColor = (status: InvoiceStatus) => {
     switch (status) {
-      case 'Kündigung eingegangen':
-        return 'info';
-      case 'offboarding':
-        return 'warning';
-      case 'offboarding abgeschlossen':
+      case 'gezahlt':
         return 'success';
+      case 'überfällig':
+        return 'error';
+      case 'gemahnt':
+        return 'warning';
+      case 'offen':
+        return 'info';
       default:
         return 'primary';
     }
   };
 
-  const filteredCancellations = cancellationData.filter((cancellation) => {
+  const filteredInvoices = invoiceData.filter((invoice) => {
     const checkFilter = (filter: Filter) => {
       if (!filter.column || !filter.operator || !filter.value) {
         return true; // Ignore incomplete filters
       }
 
-      const columnValue = cancellation[filter.column as keyof Cancellation];
+      const columnValue = invoice[filter.column as keyof Invoice];
       const lowerCaseFilterValue = filter.value.toLowerCase();
 
       if (typeof columnValue === 'string') {
@@ -115,7 +119,7 @@ export default function CancellationTable({
     let passesGeneralSearch = true;
     if (generalSearchTerm) {
       const lowerCaseGeneralSearchTerm = generalSearchTerm.toLowerCase();
-      passesGeneralSearch = Object.values(cancellation).some((value) =>
+      passesGeneralSearch = Object.values(invoice).some((value) =>
         String(value).toLowerCase().includes(lowerCaseGeneralSearchTerm)
       );
     }
@@ -124,10 +128,10 @@ export default function CancellationTable({
   });
 
   // Pagination logic
-  const totalPages = Math.ceil(filteredCancellations.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedCancellations = filteredCancellations.slice(startIndex, endIndex);
+  const paginatedInvoices = filteredInvoices.slice(startIndex, endIndex);
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -153,19 +157,19 @@ export default function CancellationTable({
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Kundenname
+                  Betrag
                 </TableCell>
                 <TableCell
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Kündigungsdatum
+                  Fälligkeitsdatum
                 </TableCell>
                 <TableCell
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Wirksames Datum
+                  Zahlungsdatum
                 </TableCell>
                 <TableCell
                   isHeader
@@ -177,37 +181,37 @@ export default function CancellationTable({
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Grund
+                  Beschreibung
                 </TableCell>
               </TableRow>
             </TableHeader>
 
             {/* Table Body */}
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-              {paginatedCancellations.map((cancellation) => (
-                <TableRow key={cancellation.id}>
+              {paginatedInvoices.map((invoice) => (
+                <TableRow key={invoice.id}>
                   <TableCell className="px-5 py-4 sm:px-6 text-start text-theme-sm text-gray-800 dark:text-white/90">
-                    {cancellation.id}
+                    {invoice.id}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {cancellation.customerId}
+                    {invoice.customerId}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {cancellation.customerName}
+                    {invoice.amount.toFixed(2)} {invoice.currency}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {cancellation.cancellationDate}
+                    {invoice.dueDate}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {cancellation.effectiveDate}
+                    {invoice.paymentDate || 'N/A'}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    <Badge size="sm" color={getStatusColor(cancellation.status)}>
-                      {cancellation.status}
+                    <Badge size="sm" color={getStatusColor(invoice.status)}>
+                      {invoice.status}
                     </Badge>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {cancellation.reason}
+                    {invoice.description}
                   </TableCell>
                 </TableRow>
               ))}
@@ -217,7 +221,7 @@ export default function CancellationTable({
       </div>
 
       {/* Pagination Controls */}
-      {filteredCancellations.length > 0 && (
+      {filteredInvoices.length > 0 && (
         <div className="border-t border-gray-100 dark:border-white/[0.05] pt-4 mt-4">
           <div className="flex flex-col sm:flex-row items-center justify-between px-5 py-4 sm:px-6">
             <div className="flex items-center gap-2 mb-4 sm:mb-0">
@@ -260,5 +264,5 @@ export default function CancellationTable({
         </div>
       )}
     </div>
-  );
-}
+  )
+};

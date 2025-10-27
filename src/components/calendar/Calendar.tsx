@@ -26,7 +26,9 @@ const Calendar: React.FC = () => {
   );
   const [eventTitle, setEventTitle] = useState("");
   const [eventStartDate, setEventStartDate] = useState("");
+  const [eventStartTime, setEventStartTime] = useState("00:00"); // New state for start time
   const [eventEndDate, setEventEndDate] = useState("");
+  const [eventEndTime, setEventEndTime] = useState("00:00"); // New state for end time
   const [eventLevel, setEventLevel] = useState("");
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const calendarRef = useRef<FullCalendar>(null);
@@ -48,33 +50,56 @@ const Calendar: React.FC = () => {
 
   useEffect(() => {
     // Initialize with some events
+    const today = new Date();
+    const tomorrow = new Date(today);
+    tomorrow.setDate(today.getDate() + 1);
+    const dayAfterTomorrow = new Date(today);
+    dayAfterTomorrow.setDate(today.getDate() + 2);
+    const twoDaysLater = new Date(today);
+    twoDaysLater.setDate(today.getDate() + 3);
+
     setEvents([
       {
         id: "1",
         title: "Veranstaltungskonferenz",
-        start: new Date().toISOString().split("T")[0],
+        start: `${today.toISOString().split("T")[0]}T09:00:00`,
+        end: `${today.toISOString().split("T")[0]}T11:00:00`,
+        allDay: false,
         extendedProps: { calendar: "Danger" }, // Use English key for internal logic
       },
       {
         id: "2",
         title: "Besprechung",
-        start: new Date(Date.now() + 86400000).toISOString().split("T")[0],
+        start: `${tomorrow.toISOString().split("T")[0]}T14:30:00`,
+        end: `${tomorrow.toISOString().split("T")[0]}T15:30:00`,
+        allDay: false,
         extendedProps: { calendar: "Success" }, // Use English key for internal logic
       },
       {
         id: "3",
         title: "Workshop",
-        start: new Date(Date.now() + 172800000).toISOString().split("T")[0],
-        end: new Date(Date.now() + 259200000).toISOString().split("T")[0],
+        start: `${dayAfterTomorrow.toISOString().split("T")[0]}T10:00:00`,
+        end: `${twoDaysLater.toISOString().split("T")[0]}T17:00:00`,
+        allDay: false,
         extendedProps: { calendar: "Primary" }, // Use English key for internal logic
+      },
+      {
+        id: "4",
+        title: "Ganztägiges Ereignis",
+        start: `${twoDaysLater.toISOString().split("T")[0]}`,
+        allDay: true,
+        extendedProps: { calendar: "Warning" },
       },
     ]);
   }, []);
 
   const handleDateSelect = (selectInfo: DateSelectArg) => {
     resetModalFields();
-    setEventStartDate(selectInfo.startStr);
-    setEventEndDate(selectInfo.endStr || selectInfo.startStr);
+    setEventStartDate(selectInfo.startStr.split("T")[0]); // Extract date part
+    setEventEndDate(selectInfo.endStr ? selectInfo.endStr.split("T")[0] : selectInfo.startStr.split("T")[0]); // Extract date part
+    // Set default times for new events
+    setEventStartTime("00:00");
+    setEventEndTime("00:00");
     openModal();
   };
 
@@ -82,13 +107,25 @@ const Calendar: React.FC = () => {
     const event = clickInfo.event;
     setSelectedEvent(event as unknown as CalendarEvent);
     setEventTitle(event.title);
-    setEventStartDate(event.start?.toISOString().split("T")[0] || "");
-    setEventEndDate(event.end?.toISOString().split("T")[0] || "");
+    // Parse start date and time
+    const start = event.start ? new Date(event.start) : null;
+    setEventStartDate(start ? start.toISOString().split("T")[0] : "");
+    setEventStartTime(start ? start.toTimeString().slice(0, 5) : "00:00");
+
+    // Parse end date and time
+    const end = event.end ? new Date(event.end) : null;
+    setEventEndDate(end ? end.toISOString().split("T")[0] : "");
+    setEventEndTime(end ? end.toTimeString().slice(0, 5) : "00:00");
+
     setEventLevel(event.extendedProps.calendar);
     openModal();
   };
 
   const handleAddOrUpdateEvent = () => {
+    const startDateTime = `${eventStartDate}T${eventStartTime}:00`;
+    const endDateTime = `${eventEndDate}T${eventEndTime}:00`;
+    const isAllDay = eventStartTime === "00:00" && eventEndTime === "00:00"; // Determine if it's an all-day event
+
     if (selectedEvent) {
       // Update existing event
       setEvents((prevEvents) =>
@@ -97,8 +134,9 @@ const Calendar: React.FC = () => {
             ? {
                 ...event,
                 title: eventTitle,
-                start: eventStartDate,
-                end: eventEndDate,
+                start: startDateTime,
+                end: endDateTime,
+                allDay: isAllDay,
                 extendedProps: { calendar: eventLevel },
               }
             : event
@@ -109,9 +147,9 @@ const Calendar: React.FC = () => {
       const newEvent: CalendarEvent = {
         id: Date.now().toString(),
         title: eventTitle,
-        start: eventStartDate,
-        end: eventEndDate,
-        allDay: true,
+        start: startDateTime,
+        end: endDateTime,
+        allDay: isAllDay,
         extendedProps: { calendar: eventLevel },
       };
       setEvents((prevEvents) => [...prevEvents, newEvent]);
@@ -123,7 +161,9 @@ const Calendar: React.FC = () => {
   const resetModalFields = () => {
     setEventTitle("");
     setEventStartDate("");
+    setEventStartTime("00:00");
     setEventEndDate("");
+    setEventEndTime("00:00");
     setEventLevel("");
     setSelectedEvent(null);
   };
@@ -240,6 +280,21 @@ const Calendar: React.FC = () => {
 
             <div className="mt-6">
               <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Startzeit eingeben
+              </label>
+              <div className="relative">
+                <input
+                  id="event-start-time"
+                  type="time"
+                  value={eventStartTime}
+                  onChange={(e) => setEventStartTime(e.target.value)}
+                  className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                 Enddatum eingeben
               </label>
               <div className="relative">
@@ -248,6 +303,21 @@ const Calendar: React.FC = () => {
                   type="date"
                   value={eventEndDate}
                   onChange={(e) => setEventEndDate(e.target.value)}
+                  className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                />
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                Endzeit eingeben
+              </label>
+              <div className="relative">
+                <input
+                  id="event-end-time"
+                  type="time"
+                  value={eventEndTime}
+                  onChange={(e) => setEventEndTime(e.target.value)}
                   className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 />
               </div>

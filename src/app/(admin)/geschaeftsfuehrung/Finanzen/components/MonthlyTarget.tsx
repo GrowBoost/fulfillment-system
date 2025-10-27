@@ -3,10 +3,10 @@
 import { ApexOptions } from "apexcharts";
 
 import dynamic from "next/dynamic";
-import { Dropdown } from "../ui/dropdown/Dropdown";
+import { Dropdown } from "@/components/ui/dropdown/Dropdown";
 import { MoreDotIcon } from "@/icons";
 import { useState } from "react";
-import { DropdownItem } from "../ui/dropdown/DropdownItem";
+import { DropdownItem } from "@/components/ui/dropdown/DropdownItem";
 // Dynamically import the ReactApexChart component
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
@@ -78,10 +78,10 @@ export default function MonthlyTarget() {
         <div className="flex justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-              Ersparnis
+              System-Performance
             </h3>
             <p className="mt-1 font-normal text-gray-500 text-theme-sm dark:text-gray-400">
-              Geld und Zeit, die durch dieses System gespart wurden
+              Leistung und Effizienz des Systems
             </p>
           </div>
           <div className="relative inline-block">

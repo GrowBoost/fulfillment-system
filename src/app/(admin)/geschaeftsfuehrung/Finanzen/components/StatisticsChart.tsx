@@ -2,7 +2,7 @@
 import React from "react";
 // import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
-import ChartTab from "../common/ChartTab";
+import ChartTab from "@/components/common/ChartTab";
 import dynamic from "next/dynamic";
 
 // Dynamically import the ReactApexChart component
@@ -13,11 +13,11 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
 export default function StatisticsChart() {
   const options: ApexOptions = {
     legend: {
-      show: false, // Hide legend
+      show: true, // Show legend
       position: "top",
       horizontalAlign: "left",
     },
-    colors: ["#0ba5ec", "#7cd4fd"], // Define line colors
+    colors: ["#0ba5ec", "#7cd4fd", "#ff6384"], // Define line colors
     chart: {
       fontFamily: "Outfit, sans-serif",
       height: 310,
@@ -28,7 +28,7 @@ export default function StatisticsChart() {
     },
     stroke: {
       curve: "straight", // Define the line style (straight, smooth, or step)
-      width: [2, 2], // Line width for each dataset
+      width: [2, 2, 2], // Line width for each dataset
     },
 
     fill: {
@@ -111,12 +111,16 @@ export default function StatisticsChart() {
 
   const series = [
     {
-      name: "Sales",
+      name: "Umsatz",
       data: [180, 190, 170, 160, 175, 165, 170, 205, 230, 210, 240, 235],
     },
     {
-      name: "Revenue",
+      name: "Neukunden",
       data: [40, 30, 50, 40, 55, 40, 70, 100, 110, 120, 150, 140],
+    },
+    {
+      name: "Kündigungen",
+      data: [10, 12, 8, 15, 11, 13, 9, 14, 10, 16, 12, 18],
     },
   ];
   return (

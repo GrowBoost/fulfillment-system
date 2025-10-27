@@ -4,7 +4,8 @@ import ComponentCard from '../../common/ComponentCard';
 import Label from '../Label';
 import Input from '../input/InputField';
 import Select from '../Select';
-import { ChevronDownIcon, EyeCloseIcon, EyeIcon, TimeIcon } from '../../../icons';
+import { EyeCloseIcon, EyeIcon, TimeIcon } from '../../../icons';
+import { ChevronDownIcon } from '@heroicons/react/24/solid';
 import DatePicker from '@/components/form/date-picker';
 
 export default function DefaultInputs() {

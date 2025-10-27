@@ -7,6 +7,7 @@ interface AgentInfoPopupProps {
   runs: number;
   timeSaved: string;
   moneySaved: string;
+  qualityScore: number;
 }
 
 const AgentInfoPopup: React.FC<AgentInfoPopupProps> = ({
@@ -14,6 +15,7 @@ const AgentInfoPopup: React.FC<AgentInfoPopupProps> = ({
   runs,
   timeSaved,
   moneySaved,
+  qualityScore,
 }) => {
   const [isVisible, setIsVisible] = useState(false);
   const iconRef = useRef<HTMLDivElement>(null);
@@ -78,8 +80,11 @@ const AgentInfoPopup: React.FC<AgentInfoPopupProps> = ({
           <p className="mb-1">
             <span className="font-medium">Zeit gespart:</span> {timeSaved}
           </p>
-          <p>
+          <p className="mb-1">
             <span className="font-medium">Geld gespart:</span> {moneySaved}
+          </p>
+          <p>
+            <span className="font-medium">Qualitätsscore:</span> {qualityScore}
           </p>
           <div className="absolute left-1/2 top-full -translate-x-1/2 w-0 h-0 border-x-8 border-x-transparent border-t-8 border-t-white dark:border-t-gray-800"></div>
         </div>
