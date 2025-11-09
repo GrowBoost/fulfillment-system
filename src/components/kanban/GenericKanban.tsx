@@ -420,8 +420,8 @@ export default function GenericKanban<T extends GenericItem>({
               <h3 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
                 {columnType} bearbeiten
               </h3>
-              <div className="mb-6"> {/* Increased margin-bottom */}
-                <label htmlFor="columnTitle" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <div className="mb-6">
+                <label htmlFor="columnTitle" className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Name
                 </label>
                 <input
@@ -429,21 +429,21 @@ export default function GenericKanban<T extends GenericItem>({
                   id="columnTitle"
                   value={tempColumnTitle}
                   onChange={(e) => setTempColumnTitle(e.target.value)}
-                  className="h-11 w-full rounded-lg border appearance-none px-4 py-2.5 text-sm shadow-theme-xs placeholder:text-gray-400 focus:outline-hidden focus:ring-3 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800 bg-transparent text-gray-800 border-gray-300 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                  className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 />
               </div>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
                   Hintergrundfarbe
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {PRESET_COLORS.map((color) => (
                     <div
                       key={color}
-                      className={`w-8 h-8 rounded-full cursor-pointer border ${ // Changed border-2 to border
+                      className={`h-8 w-8 cursor-pointer rounded-full border ${
                         tempColumnColor === color ? "border-primary" : "border-transparent"
                       }`}
-                      style={{ backgroundColor: `${color}33` }} // Apply opacity to swatch, remove inline borderColor
+                      style={{ backgroundColor: `${color}33` }}
                       onClick={() => setTempColumnColor(color)}
                     ></div>
                   ))}

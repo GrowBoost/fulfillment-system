@@ -13,6 +13,7 @@ import {
 import deLocale from "@fullcalendar/core/locales/de"; // Import German locale
 import { useModal } from "@/hooks/useModal";
 import { Modal } from "@/components/ui/modal";
+import DatePicker from "@/components/form/date-picker";
 
 interface CalendarEvent extends EventInput {
   extendedProps: {
@@ -30,6 +31,7 @@ const Calendar: React.FC = () => {
   const [eventEndDate, setEventEndDate] = useState("");
   const [eventEndTime, setEventEndTime] = useState("00:00"); // New state for end time
   const [eventLevel, setEventLevel] = useState("");
+  const [isAllDayEvent, setIsAllDayEvent] = useState(false); // New state for all-day event
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const calendarRef = useRef<FullCalendar>(null);
   const { isOpen, openModal, closeModal } = useModal();
@@ -97,9 +99,23 @@ const Calendar: React.FC = () => {
     resetModalFields();
     setEventStartDate(selectInfo.startStr.split("T")[0]); // Extract date part
     setEventEndDate(selectInfo.endStr ? selectInfo.endStr.split("T")[0] : selectInfo.startStr.split("T")[0]); // Extract date part
-    // Set default times for new events
-    setEventStartTime("00:00");
-    setEventEndTime("00:00");
+    // Set default times for new events, or mark as all-day if a full day is selected
+    const start = new Date(selectInfo.startStr);
+    const end = new Date(selectInfo.endStr);
+    const duration = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24); // Duration in days
+
+    if (selectInfo.allDay || duration >= 1) { // If a full day or multiple days are selected
+      setIsAllDayEvent(true);
+      setEventStartTime("00:00");
+      setEventEndTime("00:00");
+    } else {
+      setIsAllDayEvent(false);
+      const now = new Date();
+      const defaultStartTime = `${String(now.getHours() + 1).padStart(2, "0")}:00`;
+      const defaultEndTime = `${String(now.getHours() + 2).padStart(2, "0")}:00`;
+      setEventStartTime(defaultStartTime);
+      setEventEndTime(defaultEndTime);
+    }
     openModal();
   };
 
@@ -116,15 +132,28 @@ const Calendar: React.FC = () => {
     const end = event.end ? new Date(event.end) : null;
     setEventEndDate(end ? end.toISOString().split("T")[0] : "");
     setEventEndTime(end ? end.toTimeString().slice(0, 5) : "00:00");
-
+    setIsAllDayEvent(event.allDay); // Set all-day state based on existing event
     setEventLevel(event.extendedProps.calendar);
     openModal();
   };
 
   const handleAddOrUpdateEvent = () => {
-    const startDateTime = `${eventStartDate}T${eventStartTime}:00`;
-    const endDateTime = `${eventEndDate}T${eventEndTime}:00`;
-    const isAllDay = eventStartTime === "00:00" && eventEndTime === "00:00"; // Determine if it's an all-day event
+    // Basic validation
+    if (!eventTitle.trim()) {
+      alert("Bitte geben Sie einen Ereignistitel ein.");
+      return;
+    }
+    if (!eventStartDate || !eventEndDate) {
+      alert("Bitte wählen Sie ein Start- und Enddatum aus.");
+      return;
+    }
+    if (!isAllDayEvent && (!eventStartTime || !eventEndTime)) {
+      alert("Bitte geben Sie eine Start- und Endzeit ein.");
+      return;
+    }
+
+    const startDateTime = isAllDayEvent ? eventStartDate : `${eventStartDate}T${eventStartTime}:00`;
+    const endDateTime = isAllDayEvent ? eventEndDate : `${eventEndDate}T${eventEndTime}:00`;
 
     if (selectedEvent) {
       // Update existing event
@@ -136,7 +165,7 @@ const Calendar: React.FC = () => {
                 title: eventTitle,
                 start: startDateTime,
                 end: endDateTime,
-                allDay: isAllDay,
+                allDay: isAllDayEvent,
                 extendedProps: { calendar: eventLevel },
               }
             : event
@@ -149,7 +178,7 @@ const Calendar: React.FC = () => {
         title: eventTitle,
         start: startDateTime,
         end: endDateTime,
-        allDay: isAllDay,
+        allDay: isAllDayEvent,
         extendedProps: { calendar: eventLevel },
       };
       setEvents((prevEvents) => [...prevEvents, newEvent]);
@@ -165,6 +194,7 @@ const Calendar: React.FC = () => {
     setEventEndDate("");
     setEventEndTime("00:00");
     setEventLevel("");
+    setIsAllDayEvent(false); // Reset all-day state
     setSelectedEvent(null);
   };
 
@@ -220,9 +250,29 @@ const Calendar: React.FC = () => {
                   value={eventTitle}
                   onChange={(e) => setEventTitle(e.target.value)}
                   className="dark:bg-dark-900 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                  required
                 />
               </div>
             </div>
+
+            <div className="mt-6">
+              <div className="flex items-center">
+                <input
+                  id="all-day-event"
+                  type="checkbox"
+                  checked={isAllDayEvent}
+                  onChange={(e) => setIsAllDayEvent(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-brand-600 focus:ring-brand-500 dark:border-gray-700 dark:bg-gray-900"
+                />
+                <label
+                  htmlFor="all-day-event"
+                  className="ml-2 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                >
+                  Ganztägig
+                </label>
+              </div>
+            </div>
+
             <div className="mt-6">
               <label className="block mb-4 text-sm font-medium text-gray-700 dark:text-gray-400">
                 Ereignisfarbe
@@ -264,64 +314,58 @@ const Calendar: React.FC = () => {
             </div>
 
             <div className="mt-6">
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                Startdatum eingeben
-              </label>
-              <div className="relative">
-                <input
-                  id="event-start-date"
-                  type="date"
-                  value={eventStartDate}
-                  onChange={(e) => setEventStartDate(e.target.value)}
-                  className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                />
-              </div>
+              <DatePicker
+                id="event-date-range"
+                label="Datum eingeben"
+                mode="range"
+                defaultDate={
+                  eventStartDate && eventEndDate
+                    ? [new Date(eventStartDate), new Date(eventEndDate)]
+                    : undefined
+                }
+                onChange={([start, end]) => {
+                  setEventStartDate(start ? start.toISOString().split("T")[0] : "");
+                  setEventEndDate(end ? end.toISOString().split("T")[0] : "");
+                }}
+                required
+              />
             </div>
 
-            <div className="mt-6">
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                Startzeit eingeben
-              </label>
-              <div className="relative">
-                <input
-                  id="event-start-time"
-                  type="time"
-                  value={eventStartTime}
-                  onChange={(e) => setEventStartTime(e.target.value)}
-                  className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                />
-              </div>
-            </div>
+            {!isAllDayEvent && (
+              <>
+                <div className="mt-6">
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Startzeit eingeben
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="event-start-time"
+                      type="time"
+                      value={eventStartTime}
+                      onChange={(e) => setEventStartTime(e.target.value)}
+                      className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                      required
+                    />
+                  </div>
+                </div>
 
-            <div className="mt-6">
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                Enddatum eingeben
-              </label>
-              <div className="relative">
-                <input
-                  id="event-end-date"
-                  type="date"
-                  value={eventEndDate}
-                  onChange={(e) => setEventEndDate(e.target.value)}
-                  className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                />
-              </div>
-            </div>
-
-            <div className="mt-6">
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
-                Endzeit eingeben
-              </label>
-              <div className="relative">
-                <input
-                  id="event-end-time"
-                  type="time"
-                  value={eventEndTime}
-                  onChange={(e) => setEventEndTime(e.target.value)}
-                  className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
-                />
-              </div>
-            </div>
+                <div className="mt-6">
+                  <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">
+                    Endzeit eingeben
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="event-end-time"
+                      type="time"
+                      value={eventEndTime}
+                      onChange={(e) => setEventEndTime(e.target.value)}
+                      className="dark:bg-dark-900 h-11 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 pl-4 pr-11 text-sm text-gray-800 shadow-theme-xs placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
+                      required
+                    />
+                  </div>
+                </div>
+              </>
+            )}
           </div>
           <div className="flex items-center gap-3 mt-6 modal-footer sm:justify-end">
             <button
@@ -352,7 +396,9 @@ const renderEventContent = (eventInfo: EventContentArg) => {
       className={`event-fc-color flex fc-event-main ${colorClass} p-1 rounded-sm`}
     >
       <div className="fc-daygrid-event-dot"></div>
-      <div className="fc-event-time">{eventInfo.timeText}</div>
+      {!eventInfo.event.allDay && (
+        <div className="fc-event-time">{eventInfo.timeText}</div>
+      )}
       <div className="fc-event-title">{eventInfo.event.title}</div>
     </div>
   );

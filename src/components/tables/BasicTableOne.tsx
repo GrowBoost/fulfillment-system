@@ -9,6 +9,8 @@ import {
 
 import Badge from "../ui/badge/Badge";
 import Image from "next/image";
+import { exportToCsv, importFromCsv } from "@/utils/csvUtils";
+import { useState } from "react";
 
 interface Order {
   id: number;
@@ -25,8 +27,8 @@ interface Order {
   budget: string;
 }
 
-// Define the table data using the interface
-const tableData: Order[] = [
+// Define the initial table data using the interface
+const initialTableData: Order[] = [
   {
     id: 1,
     user: {
@@ -112,8 +114,51 @@ const tableData: Order[] = [
 ];
 
 export default function BasicTableOne() {
+  const [tableData, setTableData] = useState<Order[]>(initialTableData);
+  const [fileInputKey, setFileInputKey] = useState(0); // Key to reset file input
+
+  const handleExport = () => {
+    exportToCsv("basic_table_data.csv", tableData);
+  };
+
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const csvString = e.target?.result as string;
+        const importedData = importFromCsv<Order>(csvString);
+        setTableData(importedData);
+        setFileInputKey(prevKey => prevKey + 1); // Reset file input
+      };
+      reader.readAsText(file);
+    }
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <div className="flex justify-end p-4 gap-2">
+        <button
+          onClick={handleExport}
+          className="px-4 py-2 rounded-md bg-blue-500 text-white text-theme-sm hover:bg-blue-600"
+        >
+          Export CSV
+        </button>
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleImport}
+          className="hidden"
+          id="csv-import-basic-table"
+          key={fileInputKey} // Reset input when key changes
+        />
+        <label
+          htmlFor="csv-import-basic-table"
+          className="px-4 py-2 rounded-md bg-green-500 text-white text-theme-sm hover:bg-green-600 cursor-pointer"
+        >
+          Import CSV
+        </label>
+      </div>
       <div className="max-w-full overflow-x-auto">
         <div className="min-w-[1102px]">
           <Table>

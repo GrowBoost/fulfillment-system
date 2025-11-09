@@ -7,13 +7,15 @@ import {
   TableRow,
 } from "../ui/table";
 import Badge from "../ui/badge/Badge";
-import { invoiceData, Invoice } from "@/data/invoiceData"; // Import invoiceData and Invoice interface
-
+import { Invoice } from "@/data/invoiceData"; // Import Invoice interface
 import { InvoiceStatus } from "@/data/invoiceData";
 import { Filter } from "@/app/(admin)/buchhaltung/rechnungen/page"; // Import types from page.tsx
 import { Select } from "../ui/select/Select";
+import { exportToCsv, importFromCsv } from "@/utils/csvUtils";
+import { useState } from "react";
 
 interface InvoiceTableProps {
+  invoices: Invoice[]; // New prop for invoice data
   filters: Filter[];
   generalSearchTerm: string;
   currentPage: number;
@@ -21,9 +23,11 @@ interface InvoiceTableProps {
   onPageChange: (pageNumber: number) => void;
   onItemsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   filterLogic: 'AND' | 'OR';
+  onDataUpdate: (newData: Invoice[]) => void; // New prop to update data
 }
 
 export default function InvoiceTable({
+  invoices, // Destructure the new prop
   filters,
   generalSearchTerm,
   currentPage,
@@ -31,7 +35,11 @@ export default function InvoiceTable({
   onPageChange,
   onItemsPerPageChange,
   filterLogic,
+  onDataUpdate,
 }: InvoiceTableProps) {
+
+  const [fileInputKey, setFileInputKey] = useState(0); // Key to reset file input
+
   const getStatusColor = (status: InvoiceStatus) => {
     switch (status) {
       case 'gezahlt':
@@ -47,7 +55,7 @@ export default function InvoiceTable({
     }
   };
 
-  const filteredInvoices = invoiceData.filter((invoice) => {
+  const filteredInvoices = invoices.filter((invoice) => { // Use the invoices prop
     const checkFilter = (filter: Filter) => {
       if (!filter.column || !filter.operator || !filter.value) {
         return true; // Ignore incomplete filters
@@ -133,8 +141,48 @@ export default function InvoiceTable({
   const endIndex = startIndex + itemsPerPage;
   const paginatedInvoices = filteredInvoices.slice(startIndex, endIndex);
 
+  const handleExport = () => {
+    exportToCsv("invoices.csv", filteredInvoices);
+  };
+
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const csvString = e.target?.result as string;
+        const importedData = importFromCsv<Invoice>(csvString);
+        onDataUpdate(importedData);
+        setFileInputKey(prevKey => prevKey + 1); // Reset file input
+      };
+      reader.readAsText(file);
+    }
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <div className="flex justify-end p-4 gap-2">
+        <button
+          onClick={handleExport}
+          className="px-4 py-2 rounded-md bg-blue-500 text-white text-theme-sm hover:bg-blue-600"
+        >
+          Export CSV
+        </button>
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleImport}
+          className="hidden"
+          id="csv-import-invoice"
+          key={fileInputKey} // Reset input when key changes
+        />
+        <label
+          htmlFor="csv-import-invoice"
+          className="px-4 py-2 rounded-md bg-green-500 text-white text-theme-sm hover:bg-green-600 cursor-pointer"
+        >
+          Import CSV
+        </label>
+      </div>
       <div className="max-w-full overflow-x-auto">
         <div>
           <Table>
@@ -169,13 +217,13 @@ export default function InvoiceTable({
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Zahlungsdatum
+                  Status
                 </TableCell>
                 <TableCell
                   isHeader
                   className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                 >
-                  Status
+                  Zahlungsdatum
                 </TableCell>
                 <TableCell
                   isHeader
@@ -203,12 +251,12 @@ export default function InvoiceTable({
                     {invoice.dueDate}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {invoice.paymentDate || 'N/A'}
-                  </TableCell>
-                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     <Badge size="sm" color={getStatusColor(invoice.status)}>
                       {invoice.status}
                     </Badge>
+                  </TableCell>
+                  <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
+                    {invoice.paymentDate || 'N/A'}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     {invoice.description}

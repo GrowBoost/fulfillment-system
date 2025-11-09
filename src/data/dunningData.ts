@@ -1,6 +1,6 @@
 export interface Dunning {
   id: number;
-  customerId: string;
+  customerId: number;
   amount: number;
   currency: string;
   overdueSince: string; // e.g., "2023-10-20"
@@ -15,7 +15,7 @@ export interface Dunning {
 export const dunningData: Dunning[] = [
   {
     id: 101,
-    customerId: 'CUST001',
+    customerId: 1,
     amount: 150.75,
     currency: 'EUR',
     overdueSince: '2023-10-20',
@@ -28,7 +28,7 @@ export const dunningData: Dunning[] = [
   },
   {
     id: 102,
-    customerId: 'CUST003',
+    customerId: 3,
     amount: 300.00,
     currency: 'EUR',
     overdueSince: '2023-09-25',
@@ -41,7 +41,7 @@ export const dunningData: Dunning[] = [
   },
   {
     id: 103,
-    customerId: 'CUST005',
+    customerId: 5,
     amount: 75.50,
     currency: 'EUR',
     overdueSince: '2023-10-10',
@@ -54,7 +54,7 @@ export const dunningData: Dunning[] = [
   },
   {
     id: 104,
-    customerId: 'CUST002',
+    customerId: 2,
     amount: 220.00,
     currency: 'EUR',
     overdueSince: '2023-10-01',
@@ -67,7 +67,7 @@ export const dunningData: Dunning[] = [
   },
   {
     id: 105,
-    customerId: 'CUST004',
+    customerId: 4,
     amount: 99.99,
     currency: 'EUR',
     overdueSince: '2023-10-15',
@@ -80,7 +80,7 @@ export const dunningData: Dunning[] = [
   },
   {
     id: 106,
-    customerId: 'CUST006',
+    customerId: 6,
     amount: 50.00,
     currency: 'EUR',
     overdueSince: '2023-10-22',
@@ -93,7 +93,7 @@ export const dunningData: Dunning[] = [
   },
   {
     id: 107,
-    customerId: 'CUST007',
+    customerId: 7,
     amount: 180.20,
     currency: 'EUR',
     overdueSince: '2023-09-30',
@@ -106,7 +106,7 @@ export const dunningData: Dunning[] = [
   },
   {
     id: 108,
-    customerId: 'CUST008',
+    customerId: 8,
     amount: 45.00,
     currency: 'EUR',
     overdueSince: '2023-10-05',
@@ -119,7 +119,7 @@ export const dunningData: Dunning[] = [
   },
   {
     id: 109,
-    customerId: 'CUST009',
+    customerId: 9,
     amount: 120.00,
     currency: 'EUR',
     overdueSince: '2023-10-18',
@@ -132,7 +132,7 @@ export const dunningData: Dunning[] = [
   },
   {
     id: 110,
-    customerId: 'CUST010',
+    customerId: 10,
     amount: 65.00,
     currency: 'EUR',
     overdueSince: '2023-10-21',

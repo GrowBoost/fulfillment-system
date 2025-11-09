@@ -207,14 +207,14 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="taskTitle"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Titel
               </label>
               <input
                 type="text"
                 id="taskTitle"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newTaskTitle}
                 onChange={(e) => setNewTaskTitle(e.target.value)}
               />
@@ -222,14 +222,14 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="taskDescription"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Beschreibung
               </label>
               <textarea
                 id="taskDescription"
                 rows={3}
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newTaskDescription}
                 onChange={(e) => setNewTaskDescription(e.target.value)}
               ></textarea>
@@ -237,14 +237,14 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="taskAssignee"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Verantwortlicher
               </label>
               <input
                 type="text"
                 id="taskAssignee"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newTaskAssignee}
                 onChange={(e) => setNewTaskAssignee(e.target.value)}
               />
@@ -252,14 +252,14 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="taskDeadline"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Deadline
               </label>
               <input
                 type="date"
                 id="taskDeadline"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newTaskDeadline}
                 onChange={(e) => setNewTaskDeadline(e.target.value)}
               />
@@ -267,13 +267,13 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="taskPriority"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Priorität
               </label>
               <select
                 id="taskPriority"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newTaskPriority}
                 onChange={(e) => setNewTaskPriority(e.target.value as "low" | "medium" | "high")}
               >
@@ -310,14 +310,14 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="editTaskTitle"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Titel
               </label>
               <input
                 type="text"
                 id="editTaskTitle"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingTaskTitle}
                 onChange={(e) => setEditingTaskTitle(e.target.value)}
               />
@@ -325,14 +325,14 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="editTaskDescription"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Beschreibung
               </label>
               <textarea
                 id="editTaskDescription"
                 rows={3}
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingTaskDescription}
                 onChange={(e) => setEditingTaskDescription(e.target.value)}
               ></textarea>
@@ -340,14 +340,14 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="editTaskAssignee"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Verantwortlicher
               </label>
               <input
                 type="text"
                 id="editTaskAssignee"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingTaskAssignee}
                 onChange={(e) => setEditingTaskAssignee(e.target.value)}
               />
@@ -355,14 +355,14 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="editTaskDeadline"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Deadline
               </label>
               <input
                 type="date"
                 id="editTaskDeadline"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingTaskDeadline}
                 onChange={(e) => setEditingTaskDeadline(e.target.value)}
               />
@@ -370,13 +370,13 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="editTaskPriority"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Priorität
               </label>
               <select
                 id="editTaskPriority"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingTaskPriority}
                 onChange={(e) => setEditingTaskPriority(e.target.value as "low" | "medium" | "high")}
               >
@@ -413,14 +413,14 @@ export default function AufgabenPage() {
             <div className="mb-4">
               <label
                 htmlFor="newColumnTitle"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Kategorie Titel
               </label>
               <input
                 type="text"
                 id="newColumnTitle"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newColumnTitle}
                 onChange={(e) => setNewColumnTitle(e.target.value)}
               />

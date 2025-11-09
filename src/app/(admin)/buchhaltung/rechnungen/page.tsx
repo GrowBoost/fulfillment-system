@@ -4,7 +4,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import React, { useState } from "react";
 import InvoiceTable from "@/components/tables/InvoiceTable";
 import InputField from "@/components/form/input/InputField";
-import { Invoice } from "@/data/invoiceData"; // Import Invoice interface for column keys
+import { invoiceData as initialInvoiceData, Invoice } from "@/data/invoiceData"; // Import initialInvoiceData and Invoice interface
 import { Select } from "@/components/ui/select/Select";
 import Button from "@/components/ui/button/Button"; // Import Button component
 import { TrashBinIcon } from "@/icons"; // Import Trash icon
@@ -21,12 +21,19 @@ export interface Filter {
 }
 
 export default function RechnungenPage() {
+  const [invoices, setInvoices] = useState<Invoice[]>(initialInvoiceData); // Manage invoice data as state
   const [filters, setFilters] = useState<Filter[]>([]);
   const [generalSearchTerm, setGeneralSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [activeStatusFilter, setActiveStatusFilter] = useState<InvoiceStatus | ''>('');
   const [filterLogic, setFilterLogic] = useState<'AND' | 'OR'>('AND'); // Default to AND
+
+  // Function to update invoice data
+  const handleDataUpdate = (newData: Invoice[]) => {
+    setInvoices(newData);
+    setCurrentPage(1); // Reset to first page after data update
+  };
 
   const handleFilterChange = (id: number, field: keyof Filter, value: string | number) => {
     setFilters(prevFilters => prevFilters.map(filter =>
@@ -48,7 +55,7 @@ export default function RechnungenPage() {
         if (existingStatusFilter) {
           return prevFilters.map(f => f.column === 'status' ? { ...f, value: status } : f);
         } else {
-          return [...prevFilters, { id: Math.max(...prevFilters.map(f => f.id), 0) + 1, column: 'status', operator: '=', value: status }];
+          return [...prevFilters, { id: prevFilters.length > 0 ? Math.max(...prevFilters.map(f => f.id)) + 1 : 0, column: 'status', operator: '=', value: status }];
         }
       });
     }
@@ -70,19 +77,18 @@ export default function RechnungenPage() {
     setCurrentPage(1); // Reset to first page on search change
   };
 
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
+
   const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setItemsPerPage(Number(e.target.value));
     setCurrentPage(1); // Reset to first page when items per page changes
   };
 
-  const handlePageChange = (pageNumber: number) => {
-    setCurrentPage(pageNumber);
-  };
-
-
   const columns: { value: FilterColumn; label: string }[] = [
     { value: '', label: 'Spalte auswählen' },
-    { value: 'id', label: 'ID' },
+    { value: 'id', label: 'Rechnungs-ID' },
     { value: 'customerId', label: 'Kunden ID' },
     { value: 'amount', label: 'Betrag' },
     { value: 'currency', label: 'Währung' },
@@ -245,6 +251,7 @@ export default function RechnungenPage() {
             ))}
           </div>
           <InvoiceTable
+            invoices={invoices} // Pass the state variable
             filters={filters}
             generalSearchTerm={generalSearchTerm}
             currentPage={currentPage}
@@ -252,6 +259,7 @@ export default function RechnungenPage() {
             onPageChange={handlePageChange}
             onItemsPerPageChange={handleItemsPerPageChange}
             filterLogic={filterLogic}
+            onDataUpdate={handleDataUpdate} // Pass the data update function
           />
         </div>
       </div>

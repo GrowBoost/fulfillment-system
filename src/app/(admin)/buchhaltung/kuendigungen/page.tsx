@@ -4,7 +4,7 @@ import PageBreadcrumb from "@/components/common/PageBreadCrumb";
 import React, { useState } from "react";
 import CancellationTable from "@/components/tables/CancellationTable";
 import InputField from "@/components/form/input/InputField";
-import { Cancellation } from "@/data/cancellationData"; // Import Cancellation interface for column keys
+import { cancellationData as initialCancellationData, Cancellation } from "@/data/cancellationData"; // Import initialCancellationData and Cancellation interface for column keys
 import { Select } from "@/components/ui/select/Select";
 import Button from "@/components/ui/button/Button"; // Import Button component
 import { TrashBinIcon } from "@/icons"; // Import Trash icon
@@ -21,12 +21,19 @@ export interface Filter {
 }
 
 export default function KuendigungenPage() {
+  const [cancellations, setCancellations] = useState<Cancellation[]>(initialCancellationData); // Manage cancellation data as state
   const [filters, setFilters] = useState<Filter[]>([]);
   const [generalSearchTerm, setGeneralSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [activeCancellationFilter, setActiveCancellationFilter] = useState<CancellationStatus | ''>('');
   const [filterLogic, setFilterLogic] = useState<'AND' | 'OR'>('AND'); // Default to AND
+
+  // Function to update cancellation data
+  const handleDataUpdate = (newData: Cancellation[]) => {
+    setCancellations(newData);
+    setCurrentPage(1); // Reset to first page after data update
+  };
 
   const handleFilterChange = (id: number, field: keyof Filter, value: string | number) => {
     setFilters(prevFilters => prevFilters.map(filter =>
@@ -243,6 +250,7 @@ export default function KuendigungenPage() {
             ))}
           </div>
           <CancellationTable
+            cancellations={cancellations} // Pass the state variable
             filters={filters}
             generalSearchTerm={generalSearchTerm}
             currentPage={currentPage}
@@ -250,6 +258,7 @@ export default function KuendigungenPage() {
             onPageChange={handlePageChange}
             onItemsPerPageChange={handleItemsPerPageChange}
             filterLogic={filterLogic}
+            onDataUpdate={handleDataUpdate} // Pass the data update function
           />
         </div>
       </div>

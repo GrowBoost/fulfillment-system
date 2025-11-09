@@ -246,54 +246,48 @@ export default function ProjectKanban() {
   const calculateProgress = (checklist: ChecklistItem[]): number => {
     if (checklist.length === 0) return 0;
     const completedItems = checklist.filter((item) => item.completed).length;
-    return Math.round((completedItems / checklist.length) * 100);
+    const progress = Math.round((completedItems / checklist.length) * 100);
+    return progress;
   };
 
-  const renderProjectCard = (card: ProjectCard) => (
-    <>
-      <h5 className="mb-1 font-medium text-gray-800 dark:text-white/90">
-        {card.customerName}
-      </h5>
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        {card.description}
-      </p>
-      <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-        <p>
-          <span className="font-medium">Verantwortlicher:</span> {card.responsible}
+  const renderProjectCard = (card: ProjectCard) => {
+    const progressValue = calculateProgress(card.checklist);
+    let progressBarWidth = `${progressValue}%`;
+
+    if (progressValue > 0 && progressValue < 10) {
+      progressBarWidth = '10px'; // Set a minimum width for visibility
+    } else if (card.checklist.length === 0) {
+      progressBarWidth = '0%'; // If no checklist items, progress is 0%
+    }
+
+    return (
+      <>
+        <h5 className="mb-1 font-medium text-gray-800 dark:text-white/90">
+          {card.customerName}
+        </h5>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          {card.description}
         </p>
-        <p>
-          <span className="font-medium">Deadline:</span> {card.deadline}
-        </p>
-        <p>
-          <span className="font-medium">Fortschritt:</span> {calculateProgress(card.checklist)}%
-        </p>
-        <div className="mt-1 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-          <div
-            className="h-full rounded-full bg-primary"
-            style={{ width: `${calculateProgress(card.checklist)}%` }}
-          ></div>
+        <div className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+          <p>
+            <span className="font-medium">Verantwortlicher:</span> {card.responsible}
+          </p>
+          <p>
+            <span className="font-medium">Deadline:</span> {card.deadline}
+          </p>
+          <p>
+            <span className="font-medium">Fortschritt:</span> {progressValue}%
+          </p>
+          <div className="mt-1 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
+            <div
+              className="h-full rounded-full bg-primary"
+              style={{ width: progressBarWidth }}
+            ></div>
+          </div>
         </div>
-      </div>
-      {card.checklist.length > 0 && (
-        <div className="mt-2">
-          <h6 className="text-xs font-medium text-gray-700 dark:text-gray-300">Checkliste:</h6>
-          {card.checklist.map((item) => (
-            <div key={item.id} className="flex items-center text-xs text-gray-600 dark:text-gray-400">
-              <Checkbox
-                checked={item.completed}
-                onChange={() => toggleChecklistItem(card.id, item.id)}
-                className="mr-1"
-                id={`${card.id}-${item.id}`}
-              />
-              <label htmlFor={`${card.id}-${item.id}`} className={`${item.completed ? "line-through" : ""}`}>
-                {item.text}
-              </label>
-            </div>
-          ))}
-        </div>
-      )}
-    </>
-  );
+      </>
+    );
+  };
 
   return (
     <>
@@ -319,14 +313,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="cardCustomerName"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Kundenname
               </label>
               <input
                 type="text"
                 id="cardCustomerName"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newCardCustomerName}
                 onChange={(e) => setNewCardCustomerName(e.target.value)}
               />
@@ -334,14 +328,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="cardDescription"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Beschreibung
               </label>
               <textarea
                 id="cardDescription"
                 rows={3}
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newCardDescription}
                 onChange={(e) => setNewCardDescription(e.target.value)}
               ></textarea>
@@ -349,14 +343,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="cardResponsible"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Verantwortlicher
               </label>
               <input
                 type="text"
                 id="cardResponsible"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newCardResponsible}
                 onChange={(e) => setNewCardResponsible(e.target.value)}
               />
@@ -364,14 +358,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="cardDeadline"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Deadline
               </label>
               <input
                 type="date"
                 id="cardDeadline"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newCardDeadline}
                 onChange={(e) => setNewCardDeadline(e.target.value)}
               />
@@ -379,14 +373,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="cardChecklistItems"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Checklist-Items (Komma-separiert)
               </label>
               <input
                 type="text"
                 id="cardChecklistItems"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newCardChecklistItems}
                 onChange={(e) => setNewCardChecklistItems(e.target.value)}
               />
@@ -419,14 +413,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="editCardCustomerName"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Kundenname
               </label>
               <input
                 type="text"
                 id="editCardCustomerName"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingCardCustomerName}
                 onChange={(e) => setEditingCardCustomerName(e.target.value)}
               />
@@ -434,14 +428,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="editCardDescription"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Beschreibung
               </label>
               <textarea
                 id="editCardDescription"
                 rows={3}
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingCardDescription}
                 onChange={(e) => setEditingCardDescription(e.target.value)}
               ></textarea>
@@ -449,14 +443,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="editCardResponsible"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Verantwortlicher
               </label>
               <input
                 type="text"
                 id="editCardResponsible"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingCardResponsible}
                 onChange={(e) => setEditingCardResponsible(e.target.value)}
               />
@@ -464,14 +458,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="editCardDeadline"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Deadline
               </label>
               <input
                 type="date"
                 id="editCardDeadline"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingCardDeadline}
                 onChange={(e) => setEditingCardDeadline(e.target.value)}
               />
@@ -479,14 +473,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="editCardChecklistItems"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Checklist-Items (Komma-separiert)
               </label>
               <input
                 type="text"
                 id="editCardChecklistItems"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={editingCardChecklistItems}
                 onChange={(e) => setEditingCardChecklistItems(e.target.value)}
               />
@@ -537,14 +531,14 @@ export default function ProjectKanban() {
             <div className="mb-4">
               <label
                 htmlFor="newColumnTitle"
-                className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
               >
                 Phasen Titel
               </label>
               <input
                 type="text"
                 id="newColumnTitle"
-                className="w-full rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                className="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-brand-800"
                 value={newColumnTitle}
                 onChange={(e) => setNewColumnTitle(e.target.value)}
               />

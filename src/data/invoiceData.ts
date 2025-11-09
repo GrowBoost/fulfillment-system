@@ -2,7 +2,7 @@ export type InvoiceStatus = 'gezahlt' | 'überfällig' | 'gemahnt' | 'offen';
 
 export interface Invoice {
   id: string;
-  customerId: string;
+  customerId: number;
   amount: number;
   currency: string;
   dueDate: string;
@@ -17,8 +17,8 @@ export interface Invoice {
 
 export const invoiceData: Invoice[] = [
   {
-    id: 'PAY001',
-    customerId: 'CUST001',
+    id: 'INV001',
+    customerId: 1,
     amount: 150.00,
     currency: 'EUR',
     dueDate: '2025-10-25',
@@ -27,8 +27,8 @@ export const invoiceData: Invoice[] = [
     description: 'Monatliche Gebühr Oktober',
   },
   {
-    id: 'PAY002',
-    customerId: 'CUST002',
+    id: 'INV002',
+    customerId: 2,
     amount: 200.00,
     currency: 'EUR',
     dueDate: '2025-10-20',
@@ -37,8 +37,8 @@ export const invoiceData: Invoice[] = [
     description: 'Servicepaket A',
   },
   {
-    id: 'PAY003',
-    customerId: 'CUST003',
+    id: 'INV003',
+    customerId: 3,
     amount: 75.50,
     currency: 'EUR',
     dueDate: '2025-10-15',
@@ -46,8 +46,8 @@ export const invoiceData: Invoice[] = [
     description: 'Beratungsleistung',
   },
   {
-    id: 'PAY004',
-    customerId: 'CUST004',
+    id: 'INV004',
+    customerId: 4,
     amount: 300.00,
     currency: 'EUR',
     dueDate: '2025-11-01',
@@ -55,8 +55,8 @@ export const invoiceData: Invoice[] = [
     description: 'Jahresabo',
   },
   {
-    id: 'PAY005',
-    customerId: 'CUST005',
+    id: 'INV005',
+    customerId: 5,
     amount: 50.00,
     currency: 'EUR',
     dueDate: '2025-10-30',
@@ -65,8 +65,8 @@ export const invoiceData: Invoice[] = [
     description: 'Zusatzleistung',
   },
   {
-    id: 'PAY006',
-    customerId: 'CUST001',
+    id: 'INV006',
+    customerId: 1,
     amount: 150.00,
     currency: 'EUR',
     dueDate: '2025-11-25',
@@ -74,8 +74,8 @@ export const invoiceData: Invoice[] = [
     description: 'Monatliche Gebühr November',
   },
   {
-    id: 'PAY007',
-    customerId: 'CUST003',
+    id: 'INV007',
+    customerId: 3,
     amount: 75.50,
     currency: 'EUR',
     dueDate: '2025-09-15',
@@ -87,8 +87,8 @@ export const invoiceData: Invoice[] = [
     newDueDate: '2025-11-05',
   },
   {
-    id: 'PAY008',
-    customerId: 'CUST006',
+    id: 'INV008',
+    customerId: 6,
     amount: 120.00,
     currency: 'EUR',
     dueDate: '2025-11-10',
@@ -96,8 +96,8 @@ export const invoiceData: Invoice[] = [
     description: 'Marketingkampagne',
   },
   {
-    id: 'PAY009',
-    customerId: 'CUST007',
+    id: 'INV009',
+    customerId: 7,
     amount: 90.00,
     currency: 'EUR',
     dueDate: '2025-10-05',
@@ -105,8 +105,8 @@ export const invoiceData: Invoice[] = [
     description: 'Support-Vertrag',
   },
   {
-    id: 'PAY010',
-    customerId: 'CUST008',
+    id: 'INV010',
+    customerId: 8,
     amount: 450.00,
     currency: 'EUR',
     dueDate: '2025-12-01',
@@ -114,8 +114,8 @@ export const invoiceData: Invoice[] = [
     description: 'Projekt X Phase 1',
   },
   {
-    id: 'PAY011',
-    customerId: 'CUST009',
+    id: 'INV011',
+    customerId: 9,
     amount: 100.00,
     currency: 'EUR',
     dueDate: '2025-10-01',

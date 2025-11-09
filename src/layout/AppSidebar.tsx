@@ -32,6 +32,16 @@ const navItems: NavItem[] = [
     path: "/", // Now a top-level item
   },
   {
+    icon: <GroupIcon />, // Using GroupIcon as a placeholder, can be changed later
+    name: "Chat",
+    path: "/chat",
+  },
+  {
+    icon: <PageIcon />, // Using PageIcon as a placeholder, can be changed later
+    name: "Wiki",
+    path: "/wiki",
+  },
+  {
     icon: <CalenderIcon />,
     name: "Kalender",
     path: "/calendar",
@@ -39,14 +49,16 @@ const navItems: NavItem[] = [
   {
     icon: <UserCircleIcon />,
     name: "Benutzerprofil",
-    path: "/profile",
+    subItems: [
+      { name: "Profil", path: "/profile", pro: false },
+    ],
   },
   {
     icon: <GroupIcon />,
     name: "Geschäftsführung",
     subItems: [
       { name: "Aufgaben", path: "/geschaeftsfuehrung/aufgaben", pro: false },
-      { name: "Finanzen", path: "/geschaeftsfuehrung/umsatz", pro: false },
+      { name: "Finanzen", path: "/geschaeftsfuehrung/Finanzen", pro: false },
       { name: "KPI's", path: "/geschaeftsfuehrung/kpis", pro: false },
       { name: "Kundenstammdaten", path: "/geschaeftsfuehrung/kundenstammdaten", pro: false },
     ],
@@ -55,7 +67,7 @@ const navItems: NavItem[] = [
     icon: <GroupIcon />,
     name: "Buchhaltung",
     subItems: [
-      { name: "Zahlungen", path: "/buchhaltung/zahlungen", pro: false },
+      { name: "Rechnungen", path: "/buchhaltung/rechnungen", pro: false },
       { name: "Mahnwesen", path: "/buchhaltung/mahnwesen", pro: false },
       { name: "Kündigungen", path: "/buchhaltung/kuendigungen", pro: false },
       { name: "E-Mail-Management", path: "/buchhaltung/email-management", pro: false },
@@ -349,72 +361,104 @@ const AppSidebar: React.FC = () => {
   };
 
   return (
-    <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[290px]"
-            : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
-        }
-        ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
-        lg:translate-x-0`}
-      onMouseEnter={() => !isExpanded && setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div
-        className={`py-8 flex  ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-        }`}
+    <>
+      <aside
+        className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+          ${
+            isExpanded || isMobileOpen
+              ? "w-[290px]"
+              : isHovered
+              ? "w-[290px]"
+              : "w-[90px]"
+          }
+          ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0`}
+        onMouseEnter={() => !isExpanded && setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-        <Link href="/">
-          {isExpanded || isHovered || isMobileOpen ? (
-            <div className="flex items-center gap-2">
+        <div
+          className={`py-8 flex  ${
+            !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+          }`}
+        >
+          <Link href="/">
+            {isExpanded || isHovered || isMobileOpen ? (
+              <div className="flex items-center gap-2">
+                <Image
+                  className="dark:hidden"
+                  src="/images/logo/logo.svg"
+                  alt="Logo"
+                  width={60}
+                  height={12}
+                />
+                <Image
+                  className="hidden dark:block"
+                  src="/images/logo/logo-dark.svg"
+                  alt="Logo"
+                  width={60}
+                  height={12}
+                />
+                <span className="text-xl font-semibold text-gray-900 dark:text-white">GrowBoost</span>
+              </div>
+            ) : (
               <Image
-                className="dark:hidden"
-                src="/images/logo/logo.svg"
+                src="/images/logo/logo-icon.svg"
                 alt="Logo"
-                width={60}
-                height={12}
+                width={16}
+                height={16}
               />
-              <Image
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={60}
-                height={12}
-              />
-              <span className="text-xl font-semibold text-gray-900 dark:text-white">GrowBoost</span>
-            </div>
-          ) : (
-            <Image
-              src="/images/logo/logo-icon.svg"
-              alt="Logo"
-              width={16}
-              height={16}
-            />
-          )}
-        </Link>
-      </div>
-      <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
-        <nav className="mb-6">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Menü"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(navItems, "main")}
+            )}
+          </Link>
+        </div>
+        <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
+          <nav className="mb-6">
+            <div className="flex flex-col gap-4">
+              <div>
+                <h2
+                  className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                    !isExpanded && !isHovered
+                      ? "lg:justify-center"
+                      : "justify-start"
+                  }`}
+                >
+                  {isExpanded || isHovered || isMobileOpen ? (
+                    "Menü"
+                  ) : (
+                    <HorizontaLDots />
+                  )}
+                </h2>
+                {renderMenuItems(navItems, "main")}
+              </div>
+
+
+              <div className="mb-6">
+                <h2
+                  className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                    !isExpanded && !isHovered
+                      ? "lg:justify-center"
+                      : "justify-start"
+                  }`}
+                >
+                  {isExpanded || isHovered || isMobileOpen ? (
+                    "Quick-Links"
+                  ) : (
+                    <HorizontaLDots />
+                  )}
+                </h2>
+                <div className="grid grid-cols-2 gap-2">
+                  <button className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md dark:bg-gray-700 dark:text-gray-200">
+                    Closing
+                  </button>
+                  <Link href="/kunden/onboarding" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    Onboarding
+                  </Link>
+                  <Link href="/kunden/offboarding" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    Kündigung
+                  </Link>
+                  <Link href="/kunden/empfehlungen-bewertungen" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                    Empfehlungen
+                  </Link>
+                </div>
             </div>
 
             <div className="">
@@ -434,26 +478,27 @@ const AppSidebar: React.FC = () => {
               {renderMenuItems(uiElementsItems, "ui")}
             </div>
 
-            <div className="">
-              <h2
-                className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
-                  !isExpanded && !isHovered
-                    ? "lg:justify-center"
-                    : "justify-start"
-                }`}
-              >
-                {isExpanded || isHovered || isMobileOpen ? (
-                  "Sonstiges"
-                ) : (
-                  <HorizontaLDots />
-                )}
-              </h2>
-              {renderMenuItems(othersItems, "others")}
+              <div className="">
+                <h2
+                  className={`mb-4 text-xs uppercase flex leading-[20px] text-gray-400 ${
+                    !isExpanded && !isHovered
+                      ? "lg:justify-center"
+                      : "justify-start"
+                  }`}
+                >
+                  {isExpanded || isHovered || isMobileOpen ? (
+                    "Sonstiges"
+                  ) : (
+                    <HorizontaLDots />
+                  )}
+                </h2>
+                {renderMenuItems(othersItems, "others")}
+              </div>
             </div>
-          </div>
-        </nav>
-      </div>
-    </aside>
+          </nav>
+        </div>
+      </aside>
+    </>
   );
 };
 

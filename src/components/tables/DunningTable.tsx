@@ -6,11 +6,15 @@ import {
   TableHeader,
   TableRow,
 } from "../ui/table";
-import { dunningData, Dunning } from "@/data/dunningData"; // Import dunningData and Dunning interface
+import Badge from "../ui/badge/Badge"; // Import Badge component
+import { Dunning } from "@/data/dunningData"; // Import Dunning interface
 import { Filter } from "@/app/(admin)/buchhaltung/mahnwesen/page"; // Import types from page.tsx
 import { Select } from "../ui/select/Select";
+import { exportToCsv, importFromCsv } from "@/utils/csvUtils";
+import { useState } from "react";
 
 interface DunningTableProps {
+  dunnings: Dunning[]; // New prop for dunning data
   filters: Filter[];
   generalSearchTerm: string;
   currentPage: number;
@@ -18,9 +22,11 @@ interface DunningTableProps {
   onPageChange: (pageNumber: number) => void;
   onItemsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   filterLogic: 'AND' | 'OR';
+  onDataUpdate: (newData: Dunning[]) => void; // New prop to update data
 }
 
 export default function DunningTable({
+  dunnings, // Destructure the new prop
   filters,
   generalSearchTerm,
   currentPage,
@@ -28,9 +34,27 @@ export default function DunningTable({
   onPageChange,
   onItemsPerPageChange,
   filterLogic,
+  onDataUpdate,
 }: DunningTableProps) {
+  const [fileInputKey, setFileInputKey] = useState(0); // Key to reset file input
 
-  const filteredDunning = dunningData.filter((dunning) => {
+  const getDunningResultColor = (result: Dunning['result']) => {
+    switch (result) {
+      case 'Erfolgreich, neues Zahlungsziel vereinbart':
+      case 'Erfolgreich, Zahlung erwartet':
+      case 'Erfolgreich, Ratenzahlung vereinbart':
+        return 'success';
+      case 'Mail gesendet':
+        return 'info';
+      case 'Nicht erreicht':
+      case 'Keine Antwort':
+        return 'warning';
+      default:
+        return 'primary';
+    }
+  };
+
+  const filteredDunning = dunnings.filter((dunning) => { // Use the dunnings prop
     const checkFilter = (filter: Filter) => {
       if (!filter.column || !filter.operator || !filter.value) {
         return true; // Ignore incomplete filters
@@ -116,8 +140,48 @@ export default function DunningTable({
   const endIndex = startIndex + itemsPerPage;
   const paginatedDunning = filteredDunning.slice(startIndex, endIndex);
 
+  const handleExport = () => {
+    exportToCsv("dunnings.csv", filteredDunning);
+  };
+
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const csvString = e.target?.result as string;
+        const importedData = importFromCsv<Dunning>(csvString);
+        onDataUpdate(importedData);
+        setFileInputKey(prevKey => prevKey + 1); // Reset file input
+      };
+      reader.readAsText(file);
+    }
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <div className="flex justify-end p-4 gap-2">
+        <button
+          onClick={handleExport}
+          className="px-4 py-2 rounded-md bg-blue-500 text-white text-theme-sm hover:bg-blue-600"
+        >
+          Export CSV
+        </button>
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleImport}
+          className="hidden"
+          id="csv-import-dunning"
+          key={fileInputKey} // Reset input when key changes
+        />
+        <label
+          htmlFor="csv-import-dunning"
+          className="px-4 py-2 rounded-md bg-green-500 text-white text-theme-sm hover:bg-green-600 cursor-pointer"
+        >
+          Import CSV
+        </label>
+      </div>
       <div className="max-w-full overflow-x-auto">
         <div>
           <Table>
@@ -201,7 +265,9 @@ export default function DunningTable({
                     {dunning.callAttempts || 'N/A'}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                    {dunning.result || 'N/A'}
+                    <Badge size="sm" color={getDunningResultColor(dunning.result)}>
+                      {dunning.result || 'N/A'}
+                    </Badge>
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                     {dunning.newDueDate || 'N/A'}

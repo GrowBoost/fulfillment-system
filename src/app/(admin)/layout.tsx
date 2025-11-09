@@ -5,6 +5,7 @@ import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 import React from "react";
+import { usePathname } from "next/navigation";
 
 export default function AdminLayout({
   children,
@@ -12,6 +13,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
+  const pathname = usePathname();
 
   // Dynamic class for main content margin based on sidebar state
   const mainContentMargin = isMobileOpen
@@ -19,6 +21,9 @@ export default function AdminLayout({
     : isExpanded || isHovered
     ? "lg:ml-[290px]"
     : "lg:ml-[90px]";
+
+  // Conditionally apply padding for chat page
+  const pagePadding = pathname === '/chat' ? 'p-0 md:p-0' : 'p-4 md:p-6';
 
   return (
     <div className="min-h-screen xl:flex">
@@ -32,7 +37,7 @@ export default function AdminLayout({
         {/* Header */}
         <AppHeader />
         {/* Page Content */}
-        <div className="p-4 mx-auto h-full flex flex-col max-w-(--breakpoint-2xl) md:p-6">{children}</div>
+        <div className={`mx-auto h-full flex flex-col max-w-(--breakpoint-2xl) ${pagePadding}`}>{children}</div>
       </div>
     </div>
   );

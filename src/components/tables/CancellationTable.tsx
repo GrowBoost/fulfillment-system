@@ -7,11 +7,14 @@ import {
   TableRow,
 } from "../ui/table";
 import Badge from "../ui/badge/Badge";
-import { cancellationData, Cancellation } from "@/data/cancellationData";
+import { Cancellation } from "@/data/cancellationData";
 import { Filter } from "@/app/(admin)/buchhaltung/kuendigungen/page"; // Import types from page.tsx
 import { Select } from "../ui/select/Select";
+import { exportToCsv, importFromCsv } from "@/utils/csvUtils";
+import { useState } from "react";
 
 interface CancellationTableProps {
+  cancellations: Cancellation[]; // New prop for cancellation data
   filters: Filter[];
   generalSearchTerm: string;
   currentPage: number;
@@ -19,9 +22,11 @@ interface CancellationTableProps {
   onPageChange: (pageNumber: number) => void;
   onItemsPerPageChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   filterLogic: 'AND' | 'OR';
+  onDataUpdate: (newData: Cancellation[]) => void; // New prop to update data
 }
 
 export default function CancellationTable({
+  cancellations, // Destructure the new prop
   filters,
   generalSearchTerm,
   currentPage,
@@ -29,7 +34,10 @@ export default function CancellationTable({
   onPageChange,
   onItemsPerPageChange,
   filterLogic,
+  onDataUpdate,
 }: CancellationTableProps) {
+  const [fileInputKey, setFileInputKey] = useState(0); // Key to reset file input
+
   const getStatusColor = (status: Cancellation['status']) => {
     switch (status) {
       case 'Kündigung eingegangen':
@@ -43,7 +51,7 @@ export default function CancellationTable({
     }
   };
 
-  const filteredCancellations = cancellationData.filter((cancellation) => {
+  const filteredCancellations = cancellations.filter((cancellation) => { // Use the cancellations prop
     const checkFilter = (filter: Filter) => {
       if (!filter.column || !filter.operator || !filter.value) {
         return true; // Ignore incomplete filters
@@ -129,8 +137,48 @@ export default function CancellationTable({
   const endIndex = startIndex + itemsPerPage;
   const paginatedCancellations = filteredCancellations.slice(startIndex, endIndex);
 
+  const handleExport = () => {
+    exportToCsv("cancellations.csv", filteredCancellations);
+  };
+
+  const handleImport = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const csvString = e.target?.result as string;
+        const importedData = importFromCsv<Cancellation>(csvString);
+        onDataUpdate(importedData);
+        setFileInputKey(prevKey => prevKey + 1); // Reset file input
+      };
+      reader.readAsText(file);
+    }
+  };
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      <div className="flex justify-end p-4 gap-2">
+        <button
+          onClick={handleExport}
+          className="px-4 py-2 rounded-md bg-blue-500 text-white text-theme-sm hover:bg-blue-600"
+        >
+          Export CSV
+        </button>
+        <input
+          type="file"
+          accept=".csv"
+          onChange={handleImport}
+          className="hidden"
+          id="csv-import-cancellation"
+          key={fileInputKey} // Reset input when key changes
+        />
+        <label
+          htmlFor="csv-import-cancellation"
+          className="px-4 py-2 rounded-md bg-green-500 text-white text-theme-sm hover:bg-green-600 cursor-pointer"
+        >
+          Import CSV
+        </label>
+      </div>
       <div className="max-w-full overflow-x-auto">
         <div>
           <Table>
