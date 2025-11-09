@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -10,7 +12,6 @@ import {
 import Badge from "../ui/badge/Badge";
 import Image from "next/image";
 import { exportToCsv, importFromCsv } from "@/utils/csvUtils";
-import { useState } from "react";
 
 interface Order {
   id: number;
