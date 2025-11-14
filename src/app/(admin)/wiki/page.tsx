@@ -12,7 +12,7 @@ export default function WikiPage() {
   return (
     <div className="flex h-full flex-col">
       <PageBreadcrumb pageTitle="Wiki" />
-      <div className="flex-1 overflow-y-auto rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
+      <div className="flex-1 overflow-y-auto rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
         <WikiComponent />
       </div>
     </div>

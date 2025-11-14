@@ -52,10 +52,13 @@ const WikiComponent: React.FC = () => {
   };
 
   const handleDeleteFile = (id: string) => {
-    setWikiFiles(prevFiles => prevFiles.filter(file => file.id !== id));
-    if (activeFileId === id) {
-      setActiveFileId(wikiFiles.length > 1 ? wikiFiles[0].id : null);
-    }
+    setWikiFiles(prevFiles => {
+      const updatedFiles = prevFiles.filter(file => file.id !== id);
+      if (activeFileId === id) {
+        setActiveFileId(updatedFiles.length > 0 ? updatedFiles[0].id : null);
+      }
+      return updatedFiles;
+    });
   };
 
   const activeFile = wikiFiles.find(file => file.id === activeFileId);
@@ -65,7 +68,6 @@ const WikiComponent: React.FC = () => {
       {/* Left Sidebar for Wiki Files */}
       <div className="w-1/4 border-r border-gray-200 dark:border-gray-700 flex flex-col">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="font-semibold text-lg text-gray-900 dark:text-white">Wiki Dateien</h3>
           <button
             onClick={handleAddFile}
             className="mt-2 w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 px-4 rounded-lg text-sm"
@@ -99,10 +101,29 @@ const WikiComponent: React.FC = () => {
 
       {/* Main Content Area */}
       <div className="flex flex-col flex-grow">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
           <h3 className="font-semibold text-lg text-gray-900 dark:text-white">
             {activeFile ? activeFile.name : 'Wählen Sie eine Datei aus'}
           </h3>
+          {activeFile && (
+            <div className="flex space-x-2">
+              {isEditing ? (
+                <button
+                  onClick={handleSaveContent}
+                  className="bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 px-4 rounded-lg text-sm"
+                >
+                  Speichern
+                </button>
+              ) : (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg text-sm dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
+                >
+                  Bearbeiten
+                </button>
+              )}
+            </div>
+          )}
         </div>
         <div className="flex-grow p-4 overflow-y-auto">
           {activeFile ? (
@@ -123,25 +144,6 @@ const WikiComponent: React.FC = () => {
             </p>
           )}
         </div>
-        {activeFile && (
-          <div className="flex justify-end p-4 border-t border-gray-200 dark:border-gray-700">
-            {isEditing ? (
-              <button
-                onClick={handleSaveContent}
-                className="bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 px-4 rounded-lg"
-              >
-                Speichern
-              </button>
-            ) : (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
-              >
-                Bearbeiten
-              </button>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );

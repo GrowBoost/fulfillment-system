@@ -117,11 +117,10 @@ const ChatComponent: React.FC = () => {
   const currentChatMessages = activeChatId ? messages[activeChatId] || [] : [];
 
   return (
-    <div className="flex h-[calc(100vh-80px)] bg-white dark:bg-gray-800 rounded-lg shadow-md">
+    <div className="flex h-full bg-white dark:bg-white/[0.03] shadow-md rounded-2xl">
       {/* Left Sidebar for Contacts and Groups */}
       <div className="w-1/4 border-r border-gray-200 dark:border-gray-700 flex flex-col">
         <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-          <h3 className="font-semibold text-lg text-gray-900 dark:text-white">Chats</h3>
           <div className="flex gap-2 mt-2">
             <button
               onClick={() => setShowNewChatModal(true)}

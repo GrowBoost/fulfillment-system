@@ -183,7 +183,7 @@ export default function AufgabenPage() {
   );
 
   return (
-    <div>
+    <div className="w-full overflow-x-hidden">
       <PageBreadcrumb pageTitle="Aufgaben" />
       <GenericKanban<Task>
         initialItems={tasks}

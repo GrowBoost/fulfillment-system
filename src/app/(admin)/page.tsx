@@ -16,38 +16,44 @@ export const metadata: Metadata = {
 export default function Dashboard() {
   return (
     <div className="grid grid-cols-12 gap-4 md:gap-6">
-      {/* Four Metric Cards at the top */}
-      <div className="col-span-12 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-6">
-        <MetricCard
-          title="Neukunden"
-          value="3,782"
-          percentage="11.01%"
-          isPositive={true}
-          icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
-        />
-        <MetricCard
-          title="Aktive Kunden"
-          value="12,450"
-          percentage="5.50%"
-          isPositive={true}
-          icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
-        />
-        <MetricCard
-          title="Aktueller Monatsumsatz"
-          value="5,359"
-          percentage="9.05%"
-          isPositive={false}
-          icon={<BoxIconLine className="text-gray-800 dark:text-white/90" />}
-        />
-        <MetricCard
-          title="System Performance"
-          value="99.9%"
-          percentage="0.1%"
-          isPositive={true}
-          icon={<BoxIconLine className="text-gray-800 dark:text-white/90" />} // Using BoxIconLine as a generic icon
-        />
-        {/* MonthlyTarget moved here and adjusted to span 3 columns */}
-        <div className="col-span-12 xl:col-span-3">
+      <h2 className="text-2xl font-semibold text-gray-800 dark:text-white/90 whitespace-nowrap">
+        Herzlich Willkommen, Admin
+      </h2>
+      {/* Top section: 2x2 grid of 4 MetricCards on left, MonthlyTarget on right */}
+      <div className="col-span-12 grid grid-cols-12 gap-4 md:gap-6">
+        {/* Left section: 2x2 grid of 4 MetricCards */}
+        <div className="col-span-12 xl:col-span-8 grid grid-cols-2 gap-4 md:gap-6">
+          <MetricCard
+            title="Neukunden"
+            value="3,782"
+            percentage="11.01%"
+            isPositive={true}
+            icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
+          />
+          <MetricCard
+            title="Geldeingang diesen Monat"
+            value="12,450"
+            percentage="5.50%"
+            isPositive={true}
+            icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
+          />
+          <MetricCard
+            title="Aktueller Monatsumsatz"
+            value="5,359"
+            percentage="9.05%"
+            isPositive={false}
+            icon={<BoxIconLine className="text-gray-800 dark:text-white/90" />}
+          />
+          <MetricCard
+            title="Kündigungen"
+            value="99.9%"
+            percentage="0.1%"
+            isPositive={true}
+            icon={<BoxIconLine className="text-gray-800 dark:text-white/90" />} // Using BoxIconLine as a generic icon
+          />
+        </div>
+        {/* Right section: MonthlyTarget */}
+        <div className="col-span-12 xl:col-span-4">
           <MonthlyTarget />
         </div>
       </div>

@@ -61,6 +61,7 @@ const navItems: NavItem[] = [
       { name: "Finanzen", path: "/geschaeftsfuehrung/Finanzen", pro: false },
       { name: "KPI's", path: "/geschaeftsfuehrung/kpis", pro: false },
       { name: "Kundenstammdaten", path: "/geschaeftsfuehrung/kundenstammdaten", pro: false },
+      { name: "Teammanagement", path: "/geschaeftsfuehrung/teammanagement", pro: false },
     ],
   },
   {

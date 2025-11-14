@@ -230,7 +230,7 @@ export default function GenericKanban<T extends GenericItem>({
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white px-5 py-7 dark:border-gray-800 dark:bg-white/[0.03] xl:px-10 xl:py-12">
-      <div className="mx-auto w-full max-w-[1200px]">
+      <div className="mx-auto w-full">
         <div className="mb-6 flex items-center justify-end gap-3">
           {/* Removed the global "Neue {columnType}" button */}
         </div>
@@ -238,7 +238,7 @@ export default function GenericKanban<T extends GenericItem>({
         <DragDropContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
           <div
             ref={scrollContainerRef}
-            className="flex gap-4 overflow-x-auto pb-4 no-scrollbar"
+            className="flex gap-4 overflow-x-auto no-scrollbar"
             onMouseDown={handleMouseDown}
             onMouseLeave={handleMouseLeave}
             onMouseUp={handleMouseUp}
