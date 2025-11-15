@@ -16,28 +16,35 @@ const dummyWarnings: Warning[] = [
 
 export const WarningsOverview = () => {
   return (
-    <Card className="p-5 md:p-6">
+    <Card className="p-5 md:p-6 h-full">
       <div className="flex flex-col gap-2 mb-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
-            Warnings Overview
+            Warnungsübersicht
           </h3>
         </div>
       </div>
       {dummyWarnings.length > 0 ? (
         <div className="space-y-3">
-          {dummyWarnings.map((warning) => (
-            <Alert
-              key={warning.id}
-              variant={warning.type}
-              title={warning.type.charAt(0).toUpperCase() + warning.type.slice(1)}
-              message={warning.message}
-            />
-          ))}
+          {dummyWarnings.map((warning) => {
+            const translatedType = {
+              info: "Info",
+              warning: "Warnung",
+              error: "Fehler",
+            }[warning.type];
+            return (
+              <Alert
+                key={warning.id}
+                variant={warning.type}
+                title={translatedType}
+                message={warning.message}
+              />
+            );
+          })}
         </div>
       ) : (
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          No warnings to display.
+          Keine Warnungen anzuzeigen.
         </p>
       )}
     </Card>

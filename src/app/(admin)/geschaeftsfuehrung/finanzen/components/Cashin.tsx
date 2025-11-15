@@ -2,12 +2,16 @@ import React from 'react';
 import Card from '@/components/common/Card';
 import { DollarLineIcon } from "@/icons"; // Added DollarLineIcon
 
-const TargetVsActual: React.FC = () => {
+interface CashinProps {
+  className?: string;
+}
+
+const TargetVsActual: React.FC<CashinProps> = ({ className }) => {
   const cashThisMonth = 8500; // Placeholder data for Cash in diesen Monat
 
   return (
     <Card
-      className="bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 h-full flex flex-col"
+      className={`bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800 h-full flex flex-col justify-between ${className || ''}`}
       noHeaderBorder={true}
       headerContent={
         <div className="flex items-center gap-2">

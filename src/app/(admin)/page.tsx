@@ -9,8 +9,8 @@ import StatisticsChart from "@/components/dashboard/StatisticsChart";
 import { WarningsOverview } from "@/components/dashboard/WarningsOverview";
 
 export const metadata: Metadata = {
-  title: "Next.js Dashboard | TailAdmin - Next.js Dashboard Template",
-  description: "This is Next.js Home for TailAdmin Dashboard Template",
+  title: "Next.js Dashboard | TailAdmin - Next.js Dashboard Vorlage",
+  description: "Dies ist die Next.js Startseite für die TailAdmin Dashboard Vorlage",
 };
 
 export default function Dashboard() {
@@ -22,8 +22,9 @@ export default function Dashboard() {
       {/* Top section: 2x2 grid of 4 MetricCards on left, MonthlyTarget on right */}
       <div className="col-span-12 grid grid-cols-12 gap-4 md:gap-6">
         {/* Left section: 2x2 grid of 4 MetricCards */}
-        <div className="col-span-12 xl:col-span-8 grid grid-cols-2 gap-4 md:gap-6">
+        <div className="col-span-12 xl:col-span-8 grid grid-cols-2 gap-4 md:gap-6 items-stretch">
           <MetricCard
+            className="h-full"
             title="Neukunden"
             value="3,782"
             percentage="11.01%"
@@ -31,6 +32,7 @@ export default function Dashboard() {
             icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
           />
           <MetricCard
+            className="h-full"
             title="Geldeingang diesen Monat"
             value="12,450"
             percentage="5.50%"
@@ -38,6 +40,7 @@ export default function Dashboard() {
             icon={<GroupIcon className="text-gray-800 size-6 dark:text-white/90" />}
           />
           <MetricCard
+            className="h-full"
             title="Aktueller Monatsumsatz"
             value="5,359"
             percentage="9.05%"
@@ -45,6 +48,7 @@ export default function Dashboard() {
             icon={<BoxIconLine className="text-gray-800 dark:text-white/90" />}
           />
           <MetricCard
+            className="h-full"
             title="Kündigungen"
             value="99.9%"
             percentage="0.1%"
@@ -59,21 +63,21 @@ export default function Dashboard() {
       </div>
 
       {/* PriorityTasksOverview and WarningsOverview side-by-side */}
-      <div className="col-span-12 grid grid-cols-12 gap-4 md:gap-6 flex items-stretch"> {/* Added flex and items-stretch */}
-        <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12 grid grid-cols-12 gap-4 md:gap-6 items-stretch">
+        <div className="col-span-12 xl:col-span-6 h-full">
           <PriorityTasksOverview />
         </div>
-        <div className="col-span-12 xl:col-span-6">
+        <div className="col-span-12 xl:col-span-6 h-full">
           <WarningsOverview />
         </div>
       </div>
 
       {/* RecentOrders and StatisticsChart side-by-side */}
-      <div className="col-span-12 grid grid-cols-12 gap-4 md:gap-6 flex items-stretch"> {/* Added flex and items-stretch */}
-        <div className="col-span-12 xl:col-span-6">
+      <div className="col-span-12 grid grid-cols-12 gap-4 md:gap-6 items-stretch">
+        <div className="col-span-12 xl:col-span-6 h-full">
           <RecentOrders />
         </div>
-        <div className="col-span-12 xl:col-span-6">
+        <div className="col-span-12 xl:col-span-6 h-full">
           <StatisticsChart />
         </div>
       </div>

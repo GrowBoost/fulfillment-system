@@ -1,6 +1,6 @@
 "use client";
-import React from 'react';
-import Card from '@/components/common/Card';
+import React from "react";
+import Card from '@/components/common/Card'; // Import Card component
 import { ApexOptions } from "apexcharts";
 import dynamic from "next/dynamic";
 
@@ -8,14 +8,16 @@ const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
 });
 
-const KpiOverviewChart: React.FC = () => {
+interface ForecastLineChartProps {
+  className?: string;
+}
+
+const ForecastLineChart: React.FC<ForecastLineChartProps> = ({ className }) => {
   const options: ApexOptions = {
     legend: {
-      show: true, // Show legend for multiple KPIs
-      position: "top",
-      horizontalAlign: "left",
+      show: false,
     },
-    colors: ["#7cd4fd", "#FF5733", "#33FF57", "#FFC300"], // Define line colors for multiple KPIs (adjusted)
+    colors: ["#0ba5ec"], // Single color for forecast line
     chart: {
       fontFamily: "Outfit, sans-serif",
       height: 310,
@@ -25,8 +27,8 @@ const KpiOverviewChart: React.FC = () => {
       },
     },
     stroke: {
-      curve: "straight",
-      width: [2, 2, 2, 2], // Adjusted for one less series
+      curve: "smooth", // Smooth curve for forecast
+      width: 2,
     },
     fill: {
       type: "gradient",
@@ -61,13 +63,13 @@ const KpiOverviewChart: React.FC = () => {
     tooltip: {
       enabled: true,
       x: {
-        format: "dd MMM yyyy",
+        format: "MMM yyyy",
       },
     },
     xaxis: {
       type: "category",
       categories: [
-        "Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez",
+        "Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"
       ],
       axisBorder: {
         show: false,
@@ -87,9 +89,11 @@ const KpiOverviewChart: React.FC = () => {
         },
       },
       title: {
-        text: "",
+        text: "Umsatzprognose (€)",
         style: {
-          fontSize: "0px",
+          fontSize: "14px",
+          fontWeight: 600,
+          color: "#6B7280",
         },
       },
     },
@@ -97,26 +101,18 @@ const KpiOverviewChart: React.FC = () => {
 
   const series = [
     {
-      name: "Gewinnberechnung (€)",
-      data: [10000, 10500, 11000, 11500, 12000, 12500, 13000, 13500, 14000, 14500, 15000, 15500],
-    },
-    {
-      name: "Einnahmen vs Ausgaben (€)",
-      data: [5000, 5500, 6000, 6500, 7000, 7500, 8000, 8500, 9000, 9500, 10000, 10500],
-    },
-    {
-      name: "Cash in diesen Monat (€)",
-      data: [7000, 7500, 8000, 8500, 9000, 9500, 10000, 10500, 11000, 11500, 12000, 12500],
+      name: "Prognose",
+      data: [10000, 11000, 10500, 12000, 13000, 12500, 14000, 15000, 14500, 16000, 17000, 16500], // Placeholder forecast data
     },
   ];
 
   return (
     <Card
-      className="h-full"
-      headerContent={<h3 className="text-lg font-semibold text-gray-900 dark:text-white">Finanzübersicht</h3>}
+      className={`h-full ${className || ''}`}
+      headerContent={<h3 className="text-lg font-semibold text-gray-900 dark:text-white">Umsatzprognose</h3>}
     >
       <div className="max-w-full overflow-x-auto custom-scrollbar">
-        <div id="chartKpiOverview" className="min-w-[1000px]">
+        <div id="forecastLineChart" className="min-w-[1000px]">
           <ReactApexChart
             options={options}
             series={series}
@@ -129,4 +125,4 @@ const KpiOverviewChart: React.FC = () => {
   );
 };
 
-export default KpiOverviewChart;
+export default ForecastLineChart;

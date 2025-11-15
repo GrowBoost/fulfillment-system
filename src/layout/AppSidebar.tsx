@@ -447,16 +447,16 @@ const AppSidebar: React.FC = () => {
                   )}
                 </h2>
                 <div className="grid grid-cols-2 gap-2">
-                  <button className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md dark:bg-gray-700 dark:text-gray-200">
+                  <Link href="/closing-form" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                     Closing
-                  </button>
-                  <Link href="/kunden/onboarding" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                  </Link>
+                  <Link href="/onboarding-form" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                     Onboarding
                   </Link>
-                  <Link href="/kunden/offboarding" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                  <Link href="/cancellation-form" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                     Kündigung
                   </Link>
-                  <Link href="/kunden/empfehlungen-bewertungen" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                  <Link href="/recommendation-form" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-3 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
                     Empfehlungen
                   </Link>
                 </div>

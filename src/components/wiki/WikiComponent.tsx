@@ -1,17 +1,50 @@
 "use client";
 
-import React, { useState } from 'react';
-
-interface WikiFile {
-  id: string;
-  name: string;
-  content: string;
-}
+import React, { useState, useCallback } from 'react';
+import { WikiFile, WikiBlock, BlockType } from '@/types/Wiki';
+import WikiBlockRenderer from './WikiBlockRenderer';
+import WikiFileTreeItem from './WikiFileTreeItem';
 
 const initialWikiFiles: WikiFile[] = [
-  { id: 'file1', name: 'Einführung', content: 'Dies ist die Einführungsseite des Wikis.' },
-  { id: 'file2', name: 'Regeln & Richtlinien', content: 'Hier finden Sie die Regeln und Richtlinien.' },
-  { id: 'file3', name: 'Häufige Fragen', content: 'Antworten auf häufig gestellte Fragen.' },
+  {
+    id: crypto.randomUUID(),
+    name: 'Einführung',
+    blocks: [
+      { id: crypto.randomUUID(), type: 'heading1', content: 'Willkommen im Wiki!' },
+      { id: crypto.randomUUID(), type: 'text', content: 'Dies ist die Einführungsseite des Wikis. Hier können Sie wichtige Informationen und Ressourcen finden.' },
+      { id: crypto.randomUUID(), type: 'image', url: 'https://via.placeholder.com/400x200?text=Wiki+Image', alt: 'Placeholder Wiki Image' },
+      { id: crypto.randomUUID(), type: 'link', url: 'https://www.google.com', text: 'Besuchen Sie Google' },
+      { id: crypto.randomUUID(), type: 'document', url: 'https://www.africau.edu/images/default/sample.pdf', name: 'Beispiel-PDF' },
+    ],
+    children: [
+      {
+        id: crypto.randomUUID(),
+        name: 'Unterseite 1',
+        blocks: [{ id: crypto.randomUUID(), type: 'text', content: 'Inhalt der Unterseite 1.' }],
+      },
+      {
+        id: crypto.randomUUID(),
+        name: 'Unterseite 2',
+        blocks: [{ id: crypto.randomUUID(), type: 'text', content: 'Inhalt der Unterseite 2.' }],
+      },
+    ],
+  },
+  {
+    id: crypto.randomUUID(),
+    name: 'Regeln & Richtlinien',
+    blocks: [
+      { id: crypto.randomUUID(), type: 'heading2', content: 'Unsere Regeln' },
+      { id: crypto.randomUUID(), type: 'text', content: 'Hier finden Sie die Regeln und Richtlinien für die Nutzung des Systems.' },
+    ],
+  },
+  {
+    id: crypto.randomUUID(),
+    name: 'Häufige Fragen',
+    blocks: [
+      { id: crypto.randomUUID(), type: 'heading3', content: 'FAQ' },
+      { id: crypto.randomUUID(), type: 'text', content: 'Antworten auf häufig gestellte Fragen.' },
+    ],
+  },
 ];
 
 const WikiComponent: React.FC = () => {
@@ -19,41 +52,104 @@ const WikiComponent: React.FC = () => {
   const [activeFileId, setActiveFileId] = useState<string | null>(
     initialWikiFiles.length > 0 ? initialWikiFiles[0].id : null
   );
-  const [editingContent, setEditingContent] = useState('');
-  const [isEditing, setIsEditing] = useState(false);
 
-  React.useEffect(() => {
-    if (activeFileId) {
-      const activeFile = wikiFiles.find(file => file.id === activeFileId);
-      setEditingContent(activeFile ? activeFile.content : '');
-    } else {
-      setEditingContent('');
-    }
-  }, [activeFileId, wikiFiles]);
+  const moveBlock = useCallback((dragIndex: number, hoverIndex: number) => {
+    setWikiFiles(prevFiles =>
+      prevFiles.map(file => {
+        if (file.id === activeFileId) {
+          const newBlocks = [...file.blocks];
+          const [draggedBlock] = newBlocks.splice(dragIndex, 1);
+          newBlocks.splice(hoverIndex, 0, draggedBlock);
+          return { ...file, blocks: newBlocks };
+        }
+        return file;
+      })
+    );
+  }, [activeFileId]);
 
-  const handleSaveContent = () => {
-    if (activeFileId) {
-      setWikiFiles(prevFiles =>
-        prevFiles.map(file =>
-          file.id === activeFileId ? { ...file, content: editingContent } : file
-        )
-      );
-      setIsEditing(false);
+  const handleUpdateBlock = (fileId: string, updatedBlock: WikiBlock) => {
+    setWikiFiles(prevFiles =>
+      prevFiles.map(file =>
+        file.id === fileId
+          ? {
+              ...file,
+              blocks: file.blocks.map(block =>
+                block.id === updatedBlock.id ? updatedBlock : block
+              ),
+            }
+          : file
+      )
+    );
+  };
+
+  // Helper function to recursively find a file
+  const findFileRecursive = (files: WikiFile[], fileId: string): WikiFile | undefined => {
+    for (const file of files) {
+      if (file.id === fileId) {
+        return file;
+      }
+      if (file.children) {
+        const found = findFileRecursive(file.children, fileId);
+        if (found) {
+          return found;
+        }
+      }
     }
+    return undefined;
   };
 
   const handleAddFile = () => {
-    const newFileId = `file${wikiFiles.length + 1}`;
+    const newFileId = crypto.randomUUID();
     const newFileName = `Neue Datei ${wikiFiles.length + 1}`;
-    const newFile: WikiFile = { id: newFileId, name: newFileName, content: 'Neuer Inhalt hier.' };
+    const newFile: WikiFile = {
+      id: newFileId,
+      name: newFileName,
+      blocks: [{ id: crypto.randomUUID(), type: 'text', content: 'Neuer Inhalt hier.' }],
+    };
     setWikiFiles(prevFiles => [...prevFiles, newFile]);
     setActiveFileId(newFileId);
-    setIsEditing(true);
+  };
+
+  const handleAddSubFile = (parentId: string) => {
+    setWikiFiles(prevFiles => {
+      const addSubFileRecursive = (files: WikiFile[]): WikiFile[] => {
+        return files.map(file => {
+          if (file.id === parentId) {
+            const newSubFileId = crypto.randomUUID();
+            const newSubFile: WikiFile = {
+              id: newSubFileId,
+              name: `Neue Unterseite ${file.children ? file.children.length + 1 : 1}`,
+              blocks: [{ id: crypto.randomUUID(), type: 'text', content: 'Neuer Inhalt hier.' }],
+            };
+            return {
+              ...file,
+              children: [...(file.children || []), newSubFile],
+            };
+          }
+          if (file.children) {
+            return { ...file, children: addSubFileRecursive(file.children) };
+          }
+          return file;
+        });
+      };
+      return addSubFileRecursive(prevFiles);
+    });
   };
 
   const handleDeleteFile = (id: string) => {
     setWikiFiles(prevFiles => {
-      const updatedFiles = prevFiles.filter(file => file.id !== id);
+      const deleteFileRecursive = (files: WikiFile[]): WikiFile[] => {
+        return files.filter(file => {
+          if (file.id === id) {
+            return false;
+          }
+          if (file.children) {
+            file.children = deleteFileRecursive(file.children);
+          }
+          return true;
+        });
+      };
+      const updatedFiles = deleteFileRecursive(prevFiles);
       if (activeFileId === id) {
         setActiveFileId(updatedFiles.length > 0 ? updatedFiles[0].id : null);
       }
@@ -61,7 +157,58 @@ const WikiComponent: React.FC = () => {
     });
   };
 
-  const activeFile = wikiFiles.find(file => file.id === activeFileId);
+  const handleAddBlock = (fileId: string, type: BlockType) => {
+    setWikiFiles(prevFiles =>
+      prevFiles.map(file => {
+        if (file.id === fileId) {
+          const newBlockId = crypto.randomUUID();
+          let newBlock: WikiBlock;
+          switch (type) {
+            case 'text':
+              newBlock = { id: newBlockId, type: 'text', content: '' };
+              break;
+            case 'heading1':
+              newBlock = { id: newBlockId, type: 'heading1', content: '' };
+              break;
+            case 'heading2':
+              newBlock = { id: newBlockId, type: 'heading2', content: '' };
+              break;
+            case 'heading3':
+              newBlock = { id: newBlockId, type: 'heading3', content: '' };
+              break;
+            case 'image':
+              newBlock = { id: newBlockId, type: 'image', url: '', alt: '' };
+              break;
+            case 'link':
+              newBlock = { id: newBlockId, type: 'link', url: '', text: '' };
+              break;
+            case 'document':
+              newBlock = { id: newBlockId, type: 'document', url: '', name: '' };
+              break;
+            default:
+              return file;
+          }
+          return { ...file, blocks: [...file.blocks, newBlock] };
+        }
+        return file;
+      })
+    );
+  };
+
+  const handleDeleteBlock = (fileId: string, blockId: string) => {
+    setWikiFiles(prevFiles =>
+      prevFiles.map(file =>
+        file.id === fileId
+          ? {
+              ...file,
+              blocks: file.blocks.filter(block => block.id !== blockId),
+            }
+          : file
+      )
+    );
+  };
+
+  const activeFile = activeFileId ? findFileRecursive(wikiFiles, activeFileId) : undefined;
 
   return (
     <div className="flex h-full">
@@ -77,24 +224,15 @@ const WikiComponent: React.FC = () => {
         </div>
         <div className="flex-grow overflow-y-auto">
           {wikiFiles.map((file) => (
-            <div
+            <WikiFileTreeItem
               key={file.id}
-              className={`p-4 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 flex justify-between items-center ${
-                activeFileId === file.id ? 'bg-gray-100 dark:bg-gray-700' : ''
-              }`}
-              onClick={() => setActiveFileId(file.id)}
-            >
-              <h4 className="font-medium text-gray-900 dark:text-white">{file.name}</h4>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent selecting the file when deleting
-                  handleDeleteFile(file.id);
-                }}
-                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm"
-              >
-                Löschen
-              </button>
-            </div>
+              file={file}
+              level={0}
+              activeFileId={activeFileId}
+              setActiveFileId={setActiveFileId}
+              onAddSubFile={handleAddSubFile}
+              onDeleteFile={handleDeleteFile}
+            />
           ))}
         </div>
       </div>
@@ -107,37 +245,48 @@ const WikiComponent: React.FC = () => {
           </h3>
           {activeFile && (
             <div className="flex space-x-2">
-              {isEditing ? (
-                <button
-                  onClick={handleSaveContent}
-                  className="bg-brand-500 hover:bg-brand-600 text-white font-bold py-2 px-4 rounded-lg text-sm"
-                >
-                  Speichern
-                </button>
-              ) : (
-                <button
-                  onClick={() => setIsEditing(true)}
-                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded-lg text-sm dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
-                >
-                  Bearbeiten
-                </button>
-              )}
+              <button
+                onClick={() => handleAddBlock(activeFile.id, 'text')}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg text-sm"
+              >
+                Add Text
+              </button>
+              <button
+                onClick={() => handleAddBlock(activeFile.id, 'image')}
+                className="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg text-sm"
+              >
+                Add Image
+              </button>
+              <button
+                onClick={() => handleAddBlock(activeFile.id, 'link')}
+                className="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg text-sm"
+              >
+                Add Link
+              </button>
+              <button
+                onClick={() => handleAddBlock(activeFile.id, 'document')}
+                className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg text-sm"
+              >
+                Add Document
+              </button>
             </div>
           )}
         </div>
         <div className="flex-grow p-4 overflow-y-auto">
           {activeFile ? (
-            isEditing ? (
-              <textarea
-                className="w-full h-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-                value={editingContent}
-                onChange={(e) => setEditingContent(e.target.value)}
-              />
-            ) : (
-              <div className="prose dark:prose-invert">
-                <p>{activeFile.content}</p>
-              </div>
-            )
+            <div className="prose dark:prose-invert">
+              {activeFile.blocks.map((block, index) => (
+                <WikiBlockRenderer
+                  key={block.id}
+                  index={index}
+                  block={block}
+                  onUpdate={(updatedBlock) => handleUpdateBlock(activeFile.id, updatedBlock)}
+                  onDelete={() => handleDeleteBlock(activeFile.id, block.id)}
+                  moveBlock={moveBlock}
+                  isEditing={true}
+                />
+              ))}
+            </div>
           ) : (
             <p className="text-center text-gray-500 dark:text-gray-400">
               Wählen Sie eine Datei aus oder erstellen Sie eine neue.

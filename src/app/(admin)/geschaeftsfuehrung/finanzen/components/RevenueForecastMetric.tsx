@@ -2,11 +2,15 @@ import React from 'react';
 import Badge from "@/components/ui/badge/Badge";
 import { ArrowUpIcon, DollarLineIcon } from "@/icons"; // Corrected icon import
 
-const AverageCustomerValue: React.FC = () => {
+interface RevenueForecastProps {
+  className?: string;
+}
+
+const RevenueForecastMetric: React.FC<RevenueForecastProps> = ({ className }) => {
   const revenueForecast = 15000; // Placeholder data for Umsatzprognose
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6">
+    <div className={`rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 flex flex-col justify-between ${className || ''}`}>
       <div className="flex items-center justify-center w-12 h-12 bg-gray-100 rounded-xl dark:bg-gray-800">
         <DollarLineIcon className="text-gray-800 dark:text-white/90" /> {/* Corrected icon */}
       </div>
@@ -28,4 +32,4 @@ const AverageCustomerValue: React.FC = () => {
   );
 };
 
-export default AverageCustomerValue;
+export default RevenueForecastMetric;

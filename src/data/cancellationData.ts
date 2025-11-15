@@ -57,3 +57,18 @@ export const cancellationData: Cancellation[] = [
     reason: 'Geschäftsaufgabe',
   },
 ];
+
+export function addCancellation(newCancellationData: { name: string; email: string; reason: string }): Cancellation {
+  const newId = `CANC${String(cancellationData.length + 1).padStart(3, '0')}`;
+  const newCancellation: Cancellation = {
+    id: newId,
+    customerId: `CUST${String(cancellationData.length + 1).padStart(3, '0')}`, // Placeholder customer ID
+    customerName: newCancellationData.name,
+    cancellationDate: new Date().toISOString().split('T')[0],
+    effectiveDate: new Date(new Date().setMonth(new Date().getMonth() + 3)).toISOString().split('T')[0], // 3 months from now
+    status: 'Kündigung eingegangen',
+    reason: newCancellationData.reason,
+  };
+  cancellationData.push(newCancellation);
+  return newCancellation;
+}

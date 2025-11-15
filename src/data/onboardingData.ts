@@ -66,3 +66,24 @@ export const onboardingData: Onboarding[] = [
     responsibleAgent: 'Agent B',
   },
 ];
+
+export function addOnboarding(newOnboardingData: {
+  companyName: string;
+  contactPerson: string;
+  contactEmail: string;
+}): Onboarding {
+  const newId = `ONB${String(onboardingData.length + 1).padStart(3, '0')}`;
+  const newCustomerId = onboardingData.length > 0 ? Math.max(...onboardingData.map(o => o.customerId)) + 1 : 1;
+  const newOnboarding: Onboarding = {
+    id: newId,
+    customerId: newCustomerId,
+    startDate: new Date().toISOString().split('T')[0],
+    status: 'begonnen',
+    stepsCompleted: 0,
+    totalSteps: 5, // Default total steps
+    notes: `Onboarding-Anfrage von ${newOnboardingData.contactPerson} (${newOnboardingData.contactEmail}) für ${newOnboardingData.companyName}.`,
+    responsibleAgent: 'Unzugewiesen', // Default responsible agent
+  };
+  onboardingData.push(newOnboarding);
+  return newOnboarding;
+}

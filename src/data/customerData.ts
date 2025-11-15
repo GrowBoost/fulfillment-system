@@ -190,3 +190,17 @@ export const customerData: Customer[] = [
     notes: 'Entwickelt innovative Lösungen.',
   },
 ];
+
+export function addCustomer(newCustomer: Omit<Customer, 'id' | 'phone' | 'address' | 'company' | 'notes'>): Customer {
+  const newId = customerData.length > 0 ? Math.max(...customerData.map(c => c.id)) + 1 : 1;
+  const customerWithDefaults: Customer = {
+    id: newId,
+    phone: '',
+    address: '',
+    company: '',
+    notes: 'Added via public closing form.',
+    ...newCustomer,
+  };
+  customerData.push(customerWithDefaults);
+  return customerWithDefaults;
+}

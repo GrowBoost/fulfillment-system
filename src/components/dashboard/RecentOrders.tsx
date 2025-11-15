@@ -40,7 +40,7 @@ export default function RecentOrders() {
           </h3>
         </div>
       </div>
-      <div className="max-w-full overflow-x-auto">
+      <div className="max-w-full overflow-x-auto max-h-96 custom-scrollbar">
         <Table>
           {/* Table Header */}
           <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
